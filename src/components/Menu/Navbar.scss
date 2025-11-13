@@ -1,0 +1,70 @@
+@import "../../theme.scss";
+
+.topbar-container {
+  height: 100%;
+  background-color: #1c6c9b;
+  border-bottom: 1px solid $border-gray;
+
+  .image-container {
+    margin-left: 15px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50% !important;
+    .logo {
+      width: 50px;
+      height: auto;
+    }
+  }
+
+  .image-container-mobile {
+    margin-left: 4px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50% !important;
+
+    .logo {
+      width: 50px;
+      height: auto;
+    }
+  }
+
+  .company-name {
+    color: $gray-font-color;
+    font-family: $font-poppins;
+    font-weight: bold;
+  }
+
+  .icon-right {
+    width: 26px;
+    height: 26px;
+    color: gray;
+  }
+
+  .user-name {
+    // font-size: $font-size-subtitle;
+    color: gray;
+  }
+
+  .link-icon {
+    font-size: 26px;
+    color: $gray-font-color;
+  }
+
+  .btn-menu {
+    padding: 0px 10px 0px 0px;
+    height: 35px;
+    .avatar-user {
+      width: 35px;
+      height: 35px;
+    }
+
+    .icon-menu {
+      color: $gray-font-color;
+    }
+
+    .username-text {
+      color: $gray-font-color;
+      font-family: $font-siemreap;
+    }
+  }
+}

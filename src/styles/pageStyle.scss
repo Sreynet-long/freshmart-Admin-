@@ -1,0 +1,465 @@
+@import "../theme.scss";
+
+.page-container {
+  width: 100%;
+
+  .page-header-title-container {
+    .slash-left {
+      width: 5px;
+      height: 40px;
+      background-color: $primary-color;
+    }
+    .page-header-title {
+      font-weight: bold;
+      color: $primary-color;
+      font-size: $font-size-title;
+      font-family: $font-siemreap !important;
+    }
+    .slash-header-title {
+      color: $primary-color;
+      font-size: $font-size-title;
+      font-family: $font-poppins;
+      font-weight: bolder;
+    }
+    .page-header-ticket {
+      font-weight: bold;
+      color: rgb(104, 66, 24);
+      font-size: $font-size-title;
+      font-family: $font-siemreap !important;
+    }
+  }
+
+  //=================================== For Page General =====================================
+  .search-head-title {
+    font-family: $font-siemreap !important;
+    font-size: $font-size-body;
+    color: $primary-color;
+    opacity: 0.85 !important;
+    margin-bottom: 4px;
+  }
+
+  .search-text-field {
+    border: 0;
+    width: 100%;
+    background-color: #fff;
+    border-radius: 8px;
+    font-family: $font-siemreap !important;
+    font-size: $font-size-body;
+    font-weight: bold;
+    .css-1q55ijt-MuiInputBase-input-MuiOutlinedInput-input {
+      font-size: $font-size-body;
+      font-family: $font-poppins;
+    }
+    .css-19qh8xo-MuiInputBase-input-MuiOutlinedInput-input {
+      font-size: $font-size-body;
+      font-family: $font-poppins;
+      padding: 4px !important;
+    }
+    .css-1dune0f-MuiInputBase-input-MuiOutlinedInput-input {
+      padding: 9px !important;
+      font-family: $font-poppins;
+      font-size: $font-size-body;
+    }
+    .css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+      font-family: $font-poppins;
+      font-size: $font-size-body;
+    }
+    .css-1ua80n0-MuiInputBase-input-MuiOutlinedInput-input {
+      font-family: $font-poppins;
+      font-size: $font-size-body;
+      border-radius: 8px;
+    }
+
+    .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+      border-color: #fff;
+      font-size: $font-size-body;
+      font-family: $font-poppins;
+      border-radius: 8px;
+    }
+
+    .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-input {
+      font-family: $font-poppins;
+      border-radius: 8px;
+    }
+
+    .MuiInputLabel-root.Mui-focused {
+      font-family: $font-poppins;
+      border-radius: 8px;
+    }
+  }
+
+  //====new============
+  // .search-text-field {
+  //   width: 100%;
+  //   background-color: #fff;
+  //   border-radius: 6px;
+  //   font-family: $font-poppins;
+  //   .css-nu79wc-MuiInputAdornment-root {
+  //     color: $primary-color !important;
+  //     font-weight: bold !important;
+  //   }
+
+  //   .css-e2mtqw-MuiInputAdornment-root {
+  //     color: $primary-color !important;
+  //   }
+
+  //   .MuiOutlinedInput-input {
+  //     font-weight: bold;
+  //     color: $primary-color;
+  //     font-family: $font-poppins;
+  //     // border-radius: 6px;
+  //   }
+
+  //   .css-1ua80n0-MuiInputBase-input-MuiOutlinedInput-input {
+  //     font-family: $font-poppins;
+  //     color: $primary-color;
+  //   }
+
+  //   .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+  //     border-color: #fff;
+  //     font-family: $font-poppins;
+  //     border-radius: 6px;
+  //     color: $primary-color;
+  //   }
+
+  //   .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-input {
+  //     font-weight: bold !important;
+  //     color: $primary-color !important;
+  //     font-family: $font-poppins !important;
+  //     border-radius: 6px !important;
+  //     padding: 9px;
+  //   }
+  //   .css-1dune0f-MuiInputBase-input-MuiOutlinedInput-input {
+  //     padding: 9px;
+  //   }
+
+  //   .MuiInputLabel-root.Mui-focused {
+  //     color: $primary-color;
+  //     font-family: $font-poppins;
+  //     border-radius: 6px;
+  //   }
+
+  //   // .supplier-detail-box {
+  //   //   justify-content: space-between;
+  //   // }
+  // }
+  .select-text-field {
+    border: none;
+    // width: 100%;
+    border-radius: 8px;
+    background-color: $whife-font-color;
+    font-family: $font-poppins;
+    font-size: $font-size-body;
+    font-weight: bold;
+    .css-1blp12k-MuiInputBase-root-MuiOutlinedInput-root {
+      border: none;
+      font-family: $font-poppins;
+      font-size: $font-size-body;
+    }
+    .css-w76bbz-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-w76bbz-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-w76bbz-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+      padding: 8.5px;
+      border: none;
+    }
+    .css-1blp12k-MuiInputBase-root-MuiOutlinedInput-root:hover
+      .MuiOutlinedInput-notchedOutline {
+      border: none;
+    }
+    .css-1ll44ll-MuiOutlinedInput-notchedOutline {
+      border: none;
+    }
+  }
+  // =================== btn =======================================
+  .btn-create {
+    font-family: $font-siemreap !important;
+    font-size: $font-size-subtitle;
+    color: $whife-font-color;
+    background-color: $blue-font-color;
+    padding: 5px 15px 5px 15px;
+    border-radius: 7px;
+  }
+  // =================== Dashboard Style ============================
+  .toggle-btn-group {
+    background-color: #f4fff4;
+    border-radius: 10px;
+    padding: 10px;
+    .toggle-btn {
+      background-color: #f4fff4;
+      color: $primary-color;
+      font-size: $font-size-subtitle;
+      font-family: $font-poppins;
+      border-radius: 10px;
+      text-transform: none;
+      border: none;
+      padding: 2px 10px 2px 10px;
+      margin: 0px 5px 0px 5px;
+    }
+    .toggle-btn:hover {
+      background-color: #f4fff4;
+      color: $primary-color;
+    }
+    .toggle-btn-active {
+      margin: 5px;
+      background-color: $primary-color;
+      color: $whife-font-color;
+      font-size: $font-size-subtitle;
+      font-family: $font-poppins;
+      border-radius: 10px;
+      border: none;
+      text-transform: none;
+      margin: 0px 5px 0px 5px;
+      padding: 2px 15px 2px 15px;
+    }
+    .toggle-btn-active:hover {
+      background-color: $primary-color;
+      color: $whife-font-color;
+    }
+  }
+
+  .main-box-dashboard {
+    .box-dashboard {
+      background: $whife-font-color;
+      height: 130px;
+      border-radius: 10px;
+      padding-left: 30px;
+      padding-right: 20px;
+    }
+  }
+  .box-dashboard-icon {
+    padding: 15px;
+    border-radius: 10px;
+  }
+  .box-dash-title {
+    font-size: 25px !important;
+    font-family: $font-poppins;
+    color: rgb(0, 0, 0) !important;
+    font-weight: bold;
+  }
+  .box-number {
+    font-size: 32px;
+    font-weight: bolder;
+    font-family: $font-poppins;
+    color: $primary-color;
+  }
+
+  // =================== Setting Style ===============================
+  .box-setting {
+    background: $primary-background;
+    // width: 390px;
+    height: 120px;
+    border-radius: 10px;
+    padding-left: 30px;
+    padding-right: 20px;
+    transition: all 0.4s ease;
+  }
+  .setting-icon {
+    color: $primary-color;
+    width: 50px !important;
+    height: fit-content;
+    background-color: #ffffff;
+
+    border-radius: 5px;
+  }
+
+  .box-title {
+    font-size: $font-size-title;
+    font-family: $font-poppins;
+    color: $primary-color;
+  }
+  .box-sub-title {
+    font-size: $font-size-body;
+    font-family: $font-poppins;
+    color: $gray-font-color;
+  }
+  .box-total-user {
+    height: 90px;
+    background-color: $whife-font-color;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    padding: 10px;
+    border-radius: 10px;
+    .box-total-text {
+      color: $blue-font-color;
+      font-size: 18px;
+      font-weight: bold;
+      font-family: $font-siemreap;
+    }
+  }
+  //==================== Icon Style========================
+  .edit-icon {
+    padding: 8px;
+    border-radius: 6px;
+    background-color: rgb(66, 175, 253);
+    &:hover {
+      background-color: rgb(60, 156, 225);
+    }
+  }
+  .delete-icon {
+    padding: 8px;
+    border-radius: 6px;
+    background-color: rgb(255, 70, 70);
+    &:hover {
+      background-color: rgb(219, 61, 61);
+    }
+  }
+  .eye-icon {
+    padding: 5px;
+    border-radius: 6px;
+    background-color: rgb(217, 230, 219);
+    &:hover {
+      background-color: rgb(191, 207, 197);
+    }
+  }
+  .change-password-icon {
+    padding: 8px;
+    border-radius: 6px;
+    background-color: rgb(243, 214, 55);
+    &:hover {
+      background-color: rgb(197, 194, 27);
+    }
+  }
+  // Text Only One Line
+  .text-see-more {
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* Number of lines to display */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  // =================== Table Page Style =============================
+  .table-head-text {
+    background-color: rgb(155, 155, 228) !important;
+  }
+
+  .table {
+    width: 100%;
+    display: table;
+    overflow-x: auto;
+    white-space: nowrap;
+    border-collapse: separate !important;
+    border-spacing: 0px 6px !important;
+
+    .table-head {
+      border: 0;
+      color: white !important;
+      background: #3b9743 !important;
+      .table-cell {
+        border: 0;
+        height: 50px;
+        padding: 0px 10px;
+        color: rgb(255, 255, 255) !important;
+        font-family: $font-siemreap !important;
+        font-size: $font-size-subtitle;
+        font-weight: bold;
+      }
+
+      .table-cell-start {
+        text-align: center;
+        border: 0;
+        height: 50px;
+        padding: 0px 10px;
+        color: rgb(66, 66, 66) !important;
+        font-weight: bold;
+        font-family: $font-siemreap !important;
+        font-size: $font-size-subtitle;
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+      }
+      .table-cell-end {
+        border: 0;
+        height: 50px;
+        padding: 0px 10px;
+        font-weight: bold;
+        font-family: $font-siemreap !important;
+        font-size: $font-size-subtitle;
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+      }
+    }
+
+    .table-body {
+      border: 0;
+      .table-cell {
+        border: 0;
+        height: 50px;
+        padding: 0px 10px;
+        background-color: rgb(255, 255, 255);
+        font-family: $font-siemreap !important;
+        font-size: $font-size-subtitle;
+
+        .pending {
+          background-color: rgb(247, 219, 168);
+          opacity: 90%;
+          color: orange;
+          border: 1px solid #ff9500;
+          border-radius: 10px;
+          text-align: center;
+          font-size: 12px;
+        }
+        .accept {
+          background-color: rgb(168, 247, 194);
+          color: $primary-color;
+          border: 1px solid $primary-color;
+          border-radius: 10px;
+          text-align: center;
+          font-size: 12px;
+        }
+      }
+      .table-shop-cell {
+        font-size: 12px;
+        font-family: $font-siemreap;
+        border-radius: 20px;
+        background-color: $primary-menu;
+        padding: 5px;
+        text-align: center;
+      }
+      .table-cell-status {
+        text-align: center;
+      }
+      .table-cell-image {
+        border: 0;
+        height: 60px;
+        // padding: 0px 10px;
+        background-color: rgb(255, 255, 255);
+        font-family: $font-poppins;
+        font-size: $font-size-subtitle;
+      }
+      .table-cell-font-khmer {
+        border: 0;
+        height: 50px;
+        padding: 0px 2px;
+        background-color: rgb(255, 255, 255);
+        font-family: $font-Kantumruy;
+        font-size: $font-size-subtitle;
+        display: flex;
+        align-items: center;
+      }
+      .table-cell-start {
+        border: 0;
+        text-align: center;
+        height: 50px;
+        padding: 0px 10px;
+        background-color: rgb(255, 255, 255);
+        font-size: $font-size-subtitle;
+        font-family: $font-poppins;
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+      }
+      .table-cell-end {
+        border: 0;
+        height: 50px;
+        padding: 0px 10px;
+        font-weight: bold !important;
+        text-align: flex-end;
+        align-items: center;
+        justify-content: flex-end;
+        display: flex;
+        background-color: rgb(255, 255, 255);
+        font-family: $font-poppins;
+        font-size: $font-size-subtitle;
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+      }
+    }
+  }
+}

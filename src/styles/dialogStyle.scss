@@ -1,0 +1,150 @@
+@import "../theme.scss";
+
+.dialog-container {
+  width: 100%;
+  .css-16htz67-MuiPaper-root-MuiDialog-paper,
+  .css-qopi4n-MuiPaper-root-MuiDialog-paper {
+    border-radius: 10px;
+  }
+  .css-kw13he-MuiDialogContent-root {
+    padding: 20px 20px 0px 20px;
+  }
+  .dialog-title {
+    font-size: $font-size-title;
+    color: #FF007F;
+    font-weight: bold;
+    font-family: $font-siemreap;
+    text-align: center;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+  }
+  .dialog-subtitle {
+    font-size: $font-size-subtitle;
+    color: $primary-color;
+  }
+  .dialog-body {
+    font-size: $font-size-body;
+    color: black;
+    font-weight: bold;
+  }
+  .dialog-close-icon {
+    font-size: 25px;
+    color: 	#FF007F;
+  }
+  .date-field {
+    border: 1px;
+    width: 100%;
+    border-radius: 8px;
+    font-family: $font-siemreap;
+    font-size: $font-size-body;
+    font-weight: bold;
+
+    .MuiOutlinedInput-root {
+      border-color: #000; // Default border color
+      border-radius: 5px;
+    }
+
+    .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+      border-color: #1976d2; // Focused border color
+    }
+
+    .MuiInputLabel-root.Mui-focused {
+      font-family: $font-siemreap;
+      color: #1976d2; // Focused label color
+    }
+
+    .MuiOutlinedInput-input {
+      padding: 9px;
+      font-family: $font-siemreap;
+      font-size: $font-size-body;
+    }
+  }
+
+  .title-confirm-mess {
+    font-size: $font-size-body;
+    font-family: $font-siemreap;
+    color: $primary-color;
+  }
+  .txt-btn-refund {
+    font-size: $font-size-subtitle;
+    font-family: $font-siemreap;
+    color: $whife-font-color;
+    text-transform: none;
+  }
+  .btn-refund {
+    background-color: $primary-color;
+    color: $whife-font-color;
+  }
+  .btn-delete {
+    background-color: 	#FF007F;
+    color: $whife-font-color;
+    padding: 10px;
+    border-radius: 7px;
+  }
+  .txt-btn {
+    font-size: $font-size-subtitle;
+    font-family: $font-siemreap;
+    color: $whife-font-color;
+    text-transform: none;
+  }
+  .txt-delete {
+    font-size: $font-size-body;
+    font-family: $font-siemreap;
+    color: $gray-font-color;
+  }
+  .txt-delete-confirm {
+    font-size: $font-size-body;
+    font-family: $font-siemreap;
+    color: red;
+
+  }
+  .input-field-action {
+    border: $gray-font-color 1px solid;
+    border-radius: 7px;
+    .css-16wblaj-MuiInputBase-input-MuiOutlinedInput-input {
+      padding: 10px;
+    }
+  }
+  //=============================== Table =============================
+  .table {
+    width: 100%;
+    display: table;
+    overflow-x: auto;
+    white-space: nowrap;
+    border-collapse: separate !important;
+    border-spacing: 0px 6px !important;
+
+    .table-head {
+      border: 0;
+      background-color: $primary-color;
+      padding: 0px 30px;
+
+      .table-cell {
+        border: 0;
+        color: white;
+        font-size: 17px;
+        padding: 5px 10px;
+        font-weight: bold;
+      }
+      .table-cell-start {
+        border: 0;
+        color: white;
+        font-size: 17px;
+        padding: 5px 10px;
+        font-weight: bold;
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+      }
+      .table-cell-end {
+        border: 0;
+        color: white;
+        font-size: 17px;
+        padding: 5px 10px;
+        font-weight: bold;
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+      }
+    }
+  }
+}

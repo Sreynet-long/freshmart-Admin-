@@ -1,0 +1,135 @@
+@import "../theme.scss";
+
+.drawer-container {
+  width: 100%;
+  .css-16htz67-MuiPaper-root-MuiDialog-paper {
+    border-radius: 10px;
+  }
+  .drawer-title {
+    font-size: $font-size-title;
+    color: #ffffff;
+    font-weight: bold;
+
+    font-family: $font-siemreap, $font-poppins;
+    text-align: center;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+  }
+  .drawer-update-title {
+    font-size: $font-size-title;
+    color: #ffffff;
+    font-weight: bold;
+
+    font-family: $font-siemreap, $font-poppins;
+    text-align: center;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+  }
+  .eve-edit-drawer {
+    background-color: #eccb0c;
+  }
+  .eve-create-drawer {
+    background-color: #00bfff;
+  }
+  .eve-delete-drawer {
+    background-color: #ff007f;
+  }
+  .avater-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: 0.3s ease;
+
+    &:hover {
+      transform: scale(1.03);
+    }
+  }
+  .drawer-subtitle {
+    font-size: $font-size-subtitle;
+    color: $blue-font-color;
+  }
+  .drawer-eve-create-subtitle {
+    font-size: $font-size-subtitle;
+    color: #00bfff;
+  }
+  .drawer-eve-edit-subtitle {
+    font-size: $font-size-subtitle;
+    color: #eccb0c;
+  }
+  .drawer-evee-subtitle {
+    font-size: $font-size-subtitle;
+    color: #eccb0c;
+  }
+  .drawer-body {
+    font-size: $font-size-body;
+    color: black;
+    font-weight: bold;
+  }
+  .drawer-close-icon {
+    font-size: 25px;
+    color: red;
+  }
+  .btn-create-drawer {
+    background-color: #00bfff;
+    color: $whife-font-color;
+    text-transform: none;
+    font-size: $font-size-subtitle;
+    padding: 7px;
+  }
+  .btn-savechanges-drawer {
+    background-color: #eccb0c;
+    color: $whife-font-color;
+    text-transform: none;
+    font-size: $font-size-subtitle;
+    padding: 9px;
+  }
+
+  .date-field {
+    border: 1px;
+    width: 100%;
+    border-radius: 8px;
+    font-family: $font-poppins;
+    font-size: $font-size-body;
+    font-weight: bold;
+
+    .MuiOutlinedInput-root {
+      border-color: #000; // Default border color
+      border-radius: 5px;
+    }
+
+    .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+      border-color: #1976d2; // Focused border color
+    }
+
+    .MuiInputLabel-root.Mui-focused {
+      font-family: $font-poppins;
+      color: #1976d2; // Focused label color
+    }
+
+    .MuiOutlinedInput-input {
+      padding: 9px;
+      font-family: $font-poppins;
+      font-size: $font-size-body;
+    }
+  }
+
+  .title-confirm-mess {
+    font-size: $font-size-body;
+    font-family: $font-poppins;
+    color: $primary-color;
+  }
+  .txt-btn-refund {
+    font-size: $font-size-subtitle;
+    font-family: $font-poppins;
+    color: $whife-font-color;
+  }
+  .btn-refund {
+    background-color: $primary-color;
+    color: $whife-font-color;
+  }
+}

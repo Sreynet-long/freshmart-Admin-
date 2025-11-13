@@ -1,0 +1,61 @@
+//========================================== Colors ==========================================
+$primary-color: #263238;
+$primary-background: #eef0f3;
+$primary-menu: #c7cacf;
+$gray-font-color: #515353;
+// $gray-font-color: gray;
+$border-gray: #d9d9d9;
+$whife-font-color: #fff;
+$red-font-color: #f22400;
+$blue-font-color:#1976d2;
+//======================================= Font family =========================================
+// $font-khmer-moul: "KhmerOsMuol" !important;
+// $font-bayon: "Bayon" !important;
+$font-poppins: "Poppins";
+// $font-century: "Century";
+$font-Kantumruy: "Kantumruy";
+// $font-siemreap: "Siemreap";
+$font-siemreap:"Siemreap", sans-serif;
+
+//========================================= Font size =========================================
+$font-size-title: 19px;
+$font-size-subtitle: 16px;
+$font-size-body: 14px;
+$font-size-small: 12px;
+
+//===================================== Responsive breakpoint =================================
+@mixin desktop {
+  @media (min-width: #{1025px}) and (max-width: #{1650px}) {
+    @content;
+  }
+}
+
+@mixin laptop {
+  @media (min-width: #{769px}) and (max-width: #{1024px}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: #{426px}) and (max-width: #{768px}) {
+    @content;
+  }
+}
+
+@mixin mobile-large {
+  @media (min-width: #{426px}) and (max-width: #{600px}) {
+    @content;
+  }
+}
+
+@mixin mobile {
+  @media (min-width: #{377px}) and (max-width: #{425px}) {
+    @content;
+  }
+}
+
+@mixin mobile-small {
+  @media (min-width : #{0px}) and (max-width: #{376px}) {
+    @content;
+  }
+}
