@@ -78,13 +78,12 @@ export default function Navbar() {
           <img
             src="/freshmart-icon.png"
             alt="FreshMart Logo"
-            style={{ width: 48, height: 48, objectFit: "contain"}}
+            style={{ width: 48, height: 48, objectFit: "contain" }}
           />
           <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>
             FreshMart Admin
           </Typography>
         </Stack>
-
 
         {/* === Right side === */}
         <Stack direction="row" spacing={2} alignItems="center">
@@ -93,15 +92,15 @@ export default function Navbar() {
             variant="body1"
             sx={{ color: "#333", fontWeight: 500, mr: 1 }}
           >
-            {language === "En" ? `Welcome, ${username}` : `សួស្តី, ${username}`}
+            {language === "Kh" ? `សួស្តី, ${username}` : `Welcome, ${username}`}
           </Typography>
 
           {/* Notification */}
-          {/* <IconButton size="medium" color="success">
+          <IconButton size="medium" color="success">
             <Badge badgeContent={0} color="error">
               <Notification size={24} color="#216e1aff" />
             </Badge>
-          </IconButton> */}
+          </IconButton>
 
           {/* Language Selector */}
           {/* <Button
