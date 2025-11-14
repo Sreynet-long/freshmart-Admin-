@@ -93,7 +93,7 @@ export default function Navbar() {
             variant="body1"
             sx={{ color: "#333", fontWeight: 500, mr: 1 }}
           >
-            {language === "kh" ? `សួស្តី, ${username}` : `Welcome, ${username}`}
+            {language === "En" ? `Welcome, ${username}` : `សួស្តី, ${username}`}
           </Typography>
 
           {/* Notification */}
