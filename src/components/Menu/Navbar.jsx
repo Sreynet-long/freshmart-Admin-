@@ -96,11 +96,11 @@ export default function Navbar() {
           </Typography>
 
           {/* Notification */}
-          <IconButton size="medium" color="success">
+          {/* <IconButton size="medium" color="success">
             <Badge badgeContent={0} color="error">
               <Notification size={24} color="#216e1aff" />
             </Badge>
-          </IconButton>
+          </IconButton> */}
 
           {/* Language Selector */}
           {/* <Button

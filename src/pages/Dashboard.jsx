@@ -81,7 +81,9 @@ export default function Dashboard() {
     );
 
   // --- Data Handling ---
+
   const stats = data?.getDashboardStats ?? {};
+  const dailyRevenue = stats.dailyRevenue || [];
 
   const defaultColors = [
     "#4caf50",
@@ -222,14 +224,14 @@ export default function Dashboard() {
                     <Avatar sx={{ bgcolor: card.color }}>{card.icon}</Avatar>
                     <Box>
                       <Typography variant="subtitle2" color="text.secondary">
-                        {card.title} 
-                          {card.subtitle && (
-                        <Typography variant="caption" color="text.secondary">
-                          {card.subtitle}
-                        </Typography>
-                      )}
+                        {card.title}
+                        {card.subtitle && (
+                          <Typography variant="caption" color="text.secondary">
+                            {card.subtitle}
+                          </Typography>
+                        )}
                       </Typography>
-                     
+
                       <Typography variant="h6" fontWeight={700}>
                         {card.value}
                       </Typography>
@@ -313,10 +315,22 @@ export default function Dashboard() {
             <Card sx={{ borderRadius: 3, boxShadow: 3, width: "485px" }}>
               <CardContent>
                 <Typography variant="h6" fontWeight={700} mb={1}>
-                  <span style={{ color: green[800] }}>{formattedMonthYear}</span> Revenue Target
+                  <span style={{ color: green[800] }}>
+                    {formattedMonthYear}
+                  </span>{" "}
+                  Revenue Target
                 </Typography>
+                <Stack direction="row" justifyContent="space-between" mb={1}>
+                  <Typography variant="body2">
+                    Revenue:{" "}
+                    <strong>${stats.totalSales?.toLocaleString() || 0}</strong>
+                  </Typography>
+                  <Typography variant="body2">
+                    Target: <strong>${revenueTarget.toLocaleString()}</strong>
+                  </Typography>
+                </Stack>
                 <Typography variant="body2" mb={1}>
-                  {revenueProgress}% achieved
+                  {revenueProgress}% of monthly goal
                 </Typography>
                 <LinearProgress
                   variant="determinate"
@@ -338,7 +352,7 @@ export default function Dashboard() {
                 borderRadius: 3,
                 boxShadow: 3,
                 width: "485px",
-                height: "120px",
+                height: "147px",
               }}
             >
               <CardContent>
@@ -354,24 +368,51 @@ export default function Dashboard() {
 
           {/* Revenue Chart */}
           <Grid item xs={12} md={8}>
-            <Card sx={{ borderRadius: 3, boxShadow: 3, width: "485px" }}>
+            <Card
+              sx={{
+                borderRadius: 3,
+                boxShadow: 3,
+                width: "485px",
+                height: "389px",
+              }}
+            >
               <CardContent>
                 <Typography variant="h6" fontWeight={700} mb={2}>
-                  <span style={{ color: green[800] }}>{formattedMonthYear}</span> Daily Revenue
+                  <span style={{ color: green[800] }}>
+                    {formattedMonthYear}
+                  </span>{" "}
+                  Daily Revenue
                 </Typography>
                 <Box height={{ xs: 250, md: 300 }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={stats.dailyRevenue || []}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="day" />
-                      <YAxis
-                        tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                    <BarChart data={dailyRevenue}>
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                      <XAxis
+                        dataKey="day"
+                        label={{
+                          // value: "Day",
+                          position: "insideBottom",
+                          offset: -5,
+                        }}
+                        tick={{ fontSize: 12 }}
                       />
-                      <Tooltip formatter={(v) => `$${v.toLocaleString()}`} />
+                      <YAxis
+                        tickFormatter={(v) => `$${v.toLocaleString()}`}
+                        tick={{ fontSize: 12 }}
+                        domain={[0, "dataMax + Math.ceil(dataMax*0.1)"]}
+                      />
+                      <Tooltip
+                        formatter={(v) => [`$${v.toLocaleString()}`, "Revenue"]}
+                        contentStyle={{
+                          borderRadius: 10,
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                        }}
+                      />
                       <Bar
                         dataKey="revenue"
-                        fill={green[400]}
-                        radius={[8, 8, 0, 0]}
+                        fill={green[700]}
+                        radius={[6, 6, 0, 0]}
+                        maxBarSize={40}
                       />
                     </BarChart>
                   </ResponsiveContainer>
@@ -392,7 +433,10 @@ export default function Dashboard() {
             >
               <CardContent>
                 <Typography variant="h6" fontWeight={700} mb={2}>
-                  <span style={{ color: green[800] }}>{formattedMonthYear}</span> Top Categories
+                  <span style={{ color: green[800] }}>
+                    {formattedMonthYear}
+                  </span>{" "}
+                  Top Categories
                 </Typography>
 
                 <Box display="flex" justifyContent="center" alignItems="center">
@@ -406,7 +450,9 @@ export default function Dashboard() {
                           outerRadius={80}
                           innerRadius={40}
                           paddingAngle={3}
-                          label={({ percent }) => `${(percent * 100).toFixed(1)}%`}
+                          label={({ percent }) =>
+                            `${(percent * 100).toFixed(1)}%`
+                          }
                           labelLine={false}
                         >
                           {(stats.topCategories || []).map((_, i) => (
@@ -421,7 +467,13 @@ export default function Dashboard() {
                   {/* Legend */}
                   <Box ml={3}>
                     {(stats.topCategories || []).map((cat, i) => (
-                      <Stack key={i} direction="row" alignItems="center" spacing={1} mb={1}>
+                      <Stack
+                        key={i}
+                        direction="row"
+                        alignItems="center"
+                        spacing={1}
+                        mb={1}
+                      >
                         <Box
                           sx={{
                             width: 12,
@@ -440,7 +492,6 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </Grid>
-
         </Grid>
       </Box>
     </LocalizationProvider>
