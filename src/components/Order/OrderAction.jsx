@@ -27,7 +27,7 @@ export default function ActionProduct({
         justifyContent="center"
         alignItems="center"
       >
-        <Tooltip title="Edit Product">
+        <Tooltip title="Edit Order">
           <IconButton
             size="small"
             color="primary"
@@ -38,7 +38,7 @@ export default function ActionProduct({
           </IconButton>
         </Tooltip>
 
-        <Tooltip title="Delete Product">
+        <Tooltip title="Delete Order">
           <IconButton
             size="small"
             color="error"

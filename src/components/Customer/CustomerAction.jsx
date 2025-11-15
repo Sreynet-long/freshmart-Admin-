@@ -20,7 +20,7 @@ export default function CustomerAction({ setRefetch, username, user, userId }) {
         justifyContent="center"
         alignItems="center"
       >
-        <Tooltip title="Update Product">
+        <Tooltip title="Update Customer">
           <IconButton
             size="small"
             color="primary"
@@ -31,7 +31,7 @@ export default function CustomerAction({ setRefetch, username, user, userId }) {
           </IconButton>
         </Tooltip>
 
-        <Tooltip title="Delete Product">
+        <Tooltip title="Delete Customer">
           <IconButton
             size="small"
             color="error"
