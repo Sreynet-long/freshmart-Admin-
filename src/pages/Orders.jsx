@@ -164,21 +164,17 @@ export default function Orders() {
     setSnackbar({ open: true, message, severity });
   };
 
-  // Status change
-  const handleStatusChange = (newStatus) => {
-    if (!selectedOrder) return;
+const handleStatusChange = (newStatus) => {
+  if (!selectedOrder) return;
 
-    // Update UI immediately
-    setDrawerStatus(newStatus);
+  // Update UI immediately
+  setDrawerStatus(newStatus);
 
-    // ✅ Use `_id` as expected by backend
-    updateOrderStatus({
-      variables: {
-        _id: selectedOrder._id || selectedOrder.id,
-        status: newStatus,
-      },
-    });
-  };
+  // Pass _id as backend expects
+  updateOrderStatus({
+    variables: { _id: selectedOrder._id || selectedOrder.id, status: newStatus },
+  });
+};
 
   const handleQuantityChange = (index, newQty) => {
     setEditableItems((prev) =>
