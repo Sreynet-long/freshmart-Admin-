@@ -18,6 +18,7 @@ export const UPDATE_ORDER_STATUS = gql`
   }
 `;
 
+
 export const DELETE_ORDER = gql`
 mutation DeleteOrder($id: ID!) {
   deleteOrder(_id: $id) {

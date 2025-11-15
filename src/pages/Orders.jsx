@@ -48,7 +48,6 @@ import {
 import DeleteOrder from "../components/Order/DeleteOrder";
 
 export default function Orders() {
-  // UI state
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [drawerStatus, setDrawerStatus] = useState("");
@@ -59,21 +58,28 @@ export default function Orders() {
   const [status, setStatus] = useState("");
   const [paginationState, setPaginationState] = useState({});
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const isMobile = useMediaQuery("(max-width:600px)");
-  const statusOptions = ["Pending", "Accepted", "Processing", "Delivered", "Completed", "Cancelled"];
+  const allStatusOptions = ["Pending", "Accepted", "Processing", "Delivered", "Completed", "Cancelled"];
 
-  // GraphQL: query with current filters
+  const validTransitions = {
+    Pending: ["Accepted", "Cancelled"],
+    Accepted: ["Processing", "Cancelled"],
+    Processing: ["Delivered", "Cancelled"],
+    Delivered: ["Completed"],
+    Completed: [],
+    Cancelled: [],
+  };
+
+  // GraphQL query
   const { data, loading, refetch } = useQuery(GET_ORDER_WITH_PAGINATION, {
     variables: { page, limit, pagination: true, keyword, status },
     fetchPolicy: "network-only",
     onCompleted: (res) => {
-      const pag = res?.getOrdersWithPagination?.paginator || {};
-      setPaginationState(pag);
+      setPaginationState(res?.getOrdersWithPagination?.paginator || {});
     },
   });
 
@@ -109,8 +115,6 @@ export default function Orders() {
     },
   });
 
-  // Debounced search to avoid frequent requests
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     debounce((q) => {
       setPage(1);
@@ -132,11 +136,9 @@ export default function Orders() {
   };
 
   useEffect(() => {
-    // whenever pagination or filters change, refresh
     refetch({ page, limit, pagination: true, keyword, status });
   }, [page, limit, keyword, status, refetch]);
 
-  // Drawer handlers
   const handleOpenDrawer = (order = null) => {
     setSelectedOrder(order);
     setDrawerStatus(order?.status || "");
@@ -150,19 +152,15 @@ export default function Orders() {
     setOpenDrawer(false);
   };
 
-  // Snackbar helper
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({ open: true, message, severity });
   };
 
-  // Status change
   const handleStatusChange = (newStatus) => {
     if (!selectedOrder) return;
 
-    // Update UI immediately
     setDrawerStatus(newStatus);
 
-    // Send correct variable name expected by your backend: `_id`
     updateOrderStatus({
       variables: { _id: selectedOrder._id || selectedOrder.id, status: newStatus },
     });
@@ -179,7 +177,6 @@ export default function Orders() {
   const totalPrice = editableItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
 
   const handleSaveChanges = () => {
-    // currently this UI only updates client-side items — implement mutation if backend supports item updates
     showSnackbar("Order items updated successfully!");
     refetch();
     handleCloseDrawer();
@@ -203,10 +200,8 @@ export default function Orders() {
     }
   };
 
-  const getUserDisplay = (user, userId) => user?.username || user?.email || userId;
   const formatOrderId = (id) => (id ? `#FM-${id.slice(-6).toUpperCase()}` : "N/A");
 
-  // Delete handlers
   const openDeleteDialog = (order, e) => {
     e.stopPropagation();
     setOrderToDelete(order);
@@ -222,7 +217,6 @@ export default function Orders() {
     if (!orderId) return showSnackbar("Invalid order ID", "error");
 
     setDeleteLoading(true);
-    // backend expects `_id` param
     deleteOrderMutation({ variables: { _id: orderId } });
   };
 
@@ -232,9 +226,7 @@ export default function Orders() {
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Stack direction="row" spacing={2} alignItems="center">
           <Box sx={{ width: 5, height: 28, bgcolor: "success.main", borderRadius: 2 }} />
-          <Typography variant="h5" fontWeight={700}>
-            Orders
-          </Typography>
+          <Typography variant="h5" fontWeight={700}>Orders</Typography>
         </Stack>
       </Stack>
 
@@ -275,10 +267,8 @@ export default function Orders() {
                 <MenuItem value="">
                   <em>All Status</em>
                 </MenuItem>
-                {statusOptions.map((s) => (
-                  <MenuItem key={s} value={s}>
-                    {s}
-                  </MenuItem>
+                {allStatusOptions.map((s) => (
+                  <MenuItem key={s} value={s}>{s}</MenuItem>
                 ))}
               </Select>
             </Grid>
@@ -336,13 +326,7 @@ export default function Orders() {
 
                     <TableCell align="center">
                       <Tooltip title="Edit">
-                        <IconButton
-                          color="primary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenDrawer(row);
-                          }}
-                        >
+                        <IconButton color="primary" onClick={(e) => { e.stopPropagation(); handleOpenDrawer(row); }}>
                           <Edit />
                         </IconButton>
                       </Tooltip>
@@ -379,8 +363,7 @@ export default function Orders() {
           <Stack spacing={2}>
             <Typography variant="h6" fontWeight={700}>Order Details</Typography>
             <Divider />
-
-            <Typography>User: {getUserDisplay(selectedOrder.user, selectedOrder.userId)}</Typography>
+            <Typography>User: {selectedOrder.userId}</Typography>
 
             <Box sx={{ mt: 1 }}>
               <Typography fontWeight={600}>Shipping Information:</Typography>
@@ -395,7 +378,7 @@ export default function Orders() {
               <Typography fontWeight={600}>Payment Information:</Typography>
               <Typography variant="body2"><strong>Method:</strong> {selectedOrder?.paymentMethod || "N/A"}</Typography>
               {selectedOrder?.paymentProof && (
-                <Typography variant="body2"><strong>Payment Proof:</strong> <a href={selectedOrder.paymentProof} target="_blank" rel="noopener noreferrer" style={{ color: "#1976d2", textDecoration: "underline" }}>View Proof</a></Typography>
+                <Typography variant="body2"><strong>Proof:</strong> <a href={selectedOrder.paymentProof} target="_blank" rel="noopener noreferrer" style={{ color: "#1976d2", textDecoration: "underline" }}>View Proof</a></Typography>
               )}
             </Box>
 
@@ -404,14 +387,10 @@ export default function Orders() {
               <Select
                 size="small"
                 value={drawerStatus}
-                onChange={(e) => {
-                  const newStatus = e.target.value;
-                  setDrawerStatus(newStatus);
-                  handleStatusChange(newStatus);
-                }}
+                onChange={(e) => handleStatusChange(e.target.value)}
                 disabled={statusLoading}
               >
-                {statusOptions.map((s) => (
+                {(validTransitions[selectedOrder.status] || []).map((s) => (
                   <MenuItem key={s} value={s}>{s}</MenuItem>
                 ))}
               </Select>
@@ -431,7 +410,7 @@ export default function Orders() {
         )}
       </Drawer>
 
-      {/* Delete Order Dialog */}
+      {/* Delete Dialog */}
       <DeleteOrder
         open={deleteDialogOpen}
         title="Delete Order"
