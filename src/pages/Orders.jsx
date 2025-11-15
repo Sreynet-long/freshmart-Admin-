@@ -148,13 +148,13 @@ export default function Orders() {
   // Drawer open/close
   const handleOpenDrawer = (order = null) => {
     setSelectedOrder(order);
-    setDrawerStatus(order?.status || ""); // ✅ Set drawer local status
+    setDrawerStatus(order?.status || "");
     setEditableItems(order?.items?.map((i) => ({ ...i })) || []);
     setOpenDrawer(true);
   };
   const handleCloseDrawer = () => {
     setSelectedOrder(null);
-    setDrawerStatus(""); // ✅ reset drawer status
+    setDrawerStatus("");
     setEditableItems([]);
     setOpenDrawer(false);
   };
@@ -164,17 +164,18 @@ export default function Orders() {
     setSnackbar({ open: true, message, severity });
   };
 
-const handleStatusChange = (newStatus) => {
-  if (!selectedOrder) return;
+  const handleStatusChange = (newStatus) => {
+    if (!selectedOrder) return;
 
-  // Update UI immediately
-  setDrawerStatus(newStatus);
+    setDrawerStatus(newStatus);
 
-  // Pass _id as backend expects
-  updateOrderStatus({
-    variables: { _id: selectedOrder._id || selectedOrder.id, status: newStatus },
-  });
-};
+    updateOrderStatus({
+      variables: {
+        _id: selectedOrder._id || selectedOrder.id,
+        status: newStatus,
+      },
+    });
+  };
 
   const handleQuantityChange = (index, newQty) => {
     setEditableItems((prev) =>

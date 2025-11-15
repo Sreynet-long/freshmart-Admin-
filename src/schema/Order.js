@@ -10,7 +10,7 @@ export const CREATE_ORDER = gql`
 `;
 export const UPDATE_ORDER_STATUS = gql`
   mutation UpdateOrderStatus($id: ID!, $status: String!) {
-    updateOrderStatus(_id: $id, status: $status) {
+    updateOrderStatus(_id: $_id, status: $status) {
       isSuccess
       messageKh
       messageEn
