@@ -7,7 +7,7 @@ const apiClient = axios.create({
 const api = axios.create({
   baseUrl: " http://localhost:6380/graphql",
   // baseURL: "https://freshmart-backend-b73r.onrender.com",
-})
+});
 export default api;
 export async function deleteFileAPI(value) {
   // console.log("value::", value)
