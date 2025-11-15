@@ -1,16 +1,12 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   Stack,
   Button,
   Box,
   TextField,
   Typography,
-  Select,
-  MenuItem,
-  Grid,
-  InputAdornment,
   Table,
   TableBody,
   TableCell,
@@ -22,6 +18,10 @@ import {
   Card,
   CardContent,
   Avatar,
+  Select,
+  MenuItem,
+  Grid,
+  InputAdornment,
   useMediaQuery,
 } from "@mui/material";
 import { CiSearch } from "react-icons/ci";
@@ -44,9 +44,6 @@ export default function Products() {
   const [paginationData, setPaginationData] = useState({});
   const isMobile = useMediaQuery("(max-width:600px)");
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
   const categories = [
     "Vegetable",
     "Sneack_and_Bread",
@@ -58,27 +55,28 @@ export default function Products() {
     "Frozen_Food",
   ];
 
-  // Fetch products with pagination
   const { data, loading, refetch } = useQuery(GET_PRODUCT_WITH_PAGINATION, {
     variables: {
       page,
       limit,
       pagination: true,
       keyword,
-      ...(category ? { category } : {}),
+      ...(category && { category }),
     },
     fetchPolicy: "network-only",
-
     onCompleted: ({ getProductWithPagination }) => {
       const paginator = getProductWithPagination?.paginator || {};
       setPaginationData(paginator);
 
-      // 🔥 Auto-fix if page > totalPages
+      // Reset page if it exceeds totalPages after filtering
       if (page > paginator.totalPages && paginator.totalPages > 0) {
         setPage(1);
       }
     },
   });
+
+  const productRows = data?.getProductWithPagination?.data || [];
+  const isEmpty = !loading && productRows.length === 0;
 
   // Debounced search
   const debouncedSearch = useCallback(
@@ -89,7 +87,7 @@ export default function Products() {
         limit,
         pagination: true,
         keyword: val,
-        ...(category ? { category } : {}),
+        ...(category && { category }),
       });
     }, 500),
     [limit, category, refetch]
@@ -109,7 +107,7 @@ export default function Products() {
       limit,
       pagination: true,
       keyword,
-      ...(value ? { category: value } : {}),
+      ...(value && { category: value }),
     });
   };
 
@@ -122,19 +120,42 @@ export default function Products() {
       limit: newLimit,
       pagination: true,
       keyword,
-      ...(category ? { category } : {}),
+      ...(category && { category }),
     });
   };
 
-  const productRows = data?.getProductWithPagination?.data || [];
-  const isEmpty = !loading && productRows.length === 0;
+  // Automatically refetch when page changes
+  useEffect(() => {
+    refetch({
+      page,
+      limit,
+      pagination: true,
+      keyword,
+      ...(category && { category }),
+    });
+  }, [page, limit, keyword, category, refetch]);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   return (
     <Stack sx={{ p: { xs: 2, md: 4 } }}>
       {/* HEADER */}
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={3}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        mb={3}
+      >
         <Stack direction="row" spacing={2} alignItems="center">
-          <Box sx={{ width: 5, height: 28, bgcolor: "success.main", borderRadius: 2 }} />
+          <Box
+            sx={{
+              width: 5,
+              height: 28,
+              bgcolor: "success.main",
+              borderRadius: 2,
+            }}
+          />
           <Typography variant="h5" fontWeight={700}>
             Products
           </Typography>
@@ -200,7 +221,9 @@ export default function Products() {
         <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
           <Table>
             <TableHead>
-              <TableRow sx={{ bgcolor: "#a5c7e9ff", "& th": { fontWeight: 600 } }}>
+              <TableRow
+                sx={{ bgcolor: "#a5c7e9ff", "& th": { fontWeight: 600 } }}
+              >
                 <TableCell>N&ordm;</TableCell>
                 <TableCell>Product Name</TableCell>
                 <TableCell>Category</TableCell>
@@ -226,18 +249,21 @@ export default function Products() {
                   <TableRow
                     key={row.id || index}
                     hover
-                    sx={{ "&:hover": { bgcolor: "#f5f9f6" }, transition: "0.2s" }}
+                    sx={{ "&:hover": { bgcolor: "#f5f9f6" } }}
                   >
                     <TableCell>{(page - 1) * limit + index + 1}</TableCell>
                     <TableCell>
                       <Stack direction="row" alignItems="center" spacing={1}>
-                        <Avatar src={row?.imageUrl || ""} alt={row?.productName || ""} />
+                        <Avatar
+                          src={row?.imageUrl || ""}
+                          alt={row?.productName || ""}
+                        />
                         <Typography>{row?.productName}</Typography>
                       </Stack>
                     </TableCell>
                     <TableCell>{row.category.replaceAll("_", " ")}</TableCell>
                     <TableCell align="center">
-                      ${row?.price ? row.price.toFixed(2) : "0.00"}
+                      ${row?.price?.toFixed(2) || "0.00"}
                     </TableCell>
                     <TableCell align="center">{row.desc}</TableCell>
                     <TableCell align="center">
