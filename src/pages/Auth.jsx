@@ -70,7 +70,7 @@ const Auth = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const [showSignup, setShowSignup] = useState(true);
+  const [showSignup, setShowSignup] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
   const [showSignupConfirmPassword, setShowSignupConfirmPassword] =
@@ -88,12 +88,7 @@ const Auth = () => {
       variables: { page: 1, limit: 1 },
     }
   );
-
-  useEffect(() => {
-    if (userData?.getUserWithPagination?.data?.length > 0) setShowSignup(false);
-    else setShowSignup(true);
-  }, [userData]);
-
+  
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) navigate("/dashboard", { replace: true });
