@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Stack,
   Button,
@@ -60,23 +60,37 @@ export default function Products() {
 
   // Fetch products with pagination
   const { data, loading, refetch } = useQuery(GET_PRODUCT_WITH_PAGINATION, {
-    variables: { page, limit, pagination: true, keyword, ...(category ? { category } : {}) },
+    variables: {
+      page,
+      limit,
+      pagination: true,
+      keyword,
+      ...(category ? { category } : {}),
+    },
     fetchPolicy: "network-only",
+
     onCompleted: ({ getProductWithPagination }) => {
-      setPaginationData(getProductWithPagination?.paginator || {});
+      const paginator = getProductWithPagination?.paginator || {};
+      setPaginationData(paginator);
+
+      // 🔥 Auto-fix if page > totalPages
+      if (page > paginator.totalPages && paginator.totalPages > 0) {
+        setPage(1);
+      }
     },
   });
-
-  // Refetch whenever page, limit, keyword, or category changes
-  useEffect(() => {
-    refetch({ page, limit, pagination: true, keyword, ...(category ? { category } : {}) });
-  }, [page, limit, keyword, category, refetch]);
 
   // Debounced search
   const debouncedSearch = useCallback(
     debounce((val) => {
       setPage(1);
-      refetch({ page: 1, limit, pagination: true, keyword: val, ...(category ? { category } : {}) });
+      refetch({
+        page: 1,
+        limit,
+        pagination: true,
+        keyword: val,
+        ...(category ? { category } : {}),
+      });
     }, 500),
     [limit, category, refetch]
   );
@@ -90,14 +104,26 @@ export default function Products() {
     const value = e.target.value;
     setCategory(value);
     setPage(1);
-    refetch({ page: 1, limit, pagination: true, keyword, ...(value ? { category: value } : {}) });
+    refetch({
+      page: 1,
+      limit,
+      pagination: true,
+      keyword,
+      ...(value ? { category: value } : {}),
+    });
   };
 
   const handleLimitChange = (e) => {
     const newLimit = Number(e.target.value);
     setLimit(newLimit);
     setPage(1);
-    refetch({ page: 1, limit: newLimit, pagination: true, keyword, ...(category ? { category } : {}) });
+    refetch({
+      page: 1,
+      limit: newLimit,
+      pagination: true,
+      keyword,
+      ...(category ? { category } : {}),
+    });
   };
 
   const productRows = data?.getProductWithPagination?.data || [];

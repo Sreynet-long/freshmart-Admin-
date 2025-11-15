@@ -5,7 +5,7 @@ const apiClient = axios.create({
   timeout: 1000,
 });
 const api = axios.create({
-  // baseUrl: " http://localhost:6380",
+  // baseUrl: " http://localhost:6380/graphql",
   baseURL: "https://freshmart-backend-b73r.onrender.com",
 })
 export default api;
