@@ -244,7 +244,7 @@ function Contacts() {
                 <TableCell>Contact Name</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Subject</TableCell>
-                <TableCell>Message</TableCell>
+                {/* <TableCell>Message</TableCell> */}
                 <TableCell>Status</TableCell>
                 <TableCell>Received At</TableCell>
                 <TableCell>Updated At</TableCell>
@@ -285,7 +285,7 @@ function Contacts() {
                     <TableCell>{row.contactName}</TableCell>
                     <TableCell>{row.email}</TableCell>
                     <TableCell>{row.subject}</TableCell>
-                    <TableCell>{row.message}</TableCell>
+                    {/* <TableCell>{row.message}</TableCell> */}
                     <TableCell>
                       <Chip
                         label={row.status || "New"}
