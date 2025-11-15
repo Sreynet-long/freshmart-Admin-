@@ -31,7 +31,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { CiSearch } from "react-icons/ci";
-import { Add as AddIcon, Save as SaveIcon } from "@mui/icons-material";
+import { Save as SaveIcon } from "@mui/icons-material";
 import { useQuery, useMutation } from "@apollo/client/react";
 import debounce from "lodash.debounce";
 import dayjs from "dayjs";
@@ -48,41 +48,32 @@ import {
 import DeleteOrder from "../components/Order/DeleteOrder";
 
 export default function Orders() {
+  // UI state
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [drawerStatus, setDrawerStatus] = useState(""); // ✅ Local drawer status
+  const [drawerStatus, setDrawerStatus] = useState("");
   const [editableItems, setEditableItems] = useState([]);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(4);
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState("");
   const [paginationState, setPaginationState] = useState({});
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const isMobile = useMediaQuery("(max-width:600px)");
-  const statusOptions = [
-    "Pending",
-    "Accepted",
-    "Processing",
-    "Delivered",
-    "Completed",
-    "Cancelled",
-  ];
+  const statusOptions = ["Pending", "Accepted", "Processing", "Delivered", "Completed", "Cancelled"];
 
-  // Queries
+  // GraphQL: query with current filters
   const { data, loading, refetch } = useQuery(GET_ORDER_WITH_PAGINATION, {
-    variables: { page, limit, pagination: true, keyword, status: "" },
+    variables: { page, limit, pagination: true, keyword, status },
     fetchPolicy: "network-only",
-    onCompleted: ({ getOrdersWithPagination }) => {
-      setPaginationState(getOrdersWithPagination?.paginator || {});
+    onCompleted: (res) => {
+      const pag = res?.getOrdersWithPagination?.paginator || {};
+      setPaginationState(pag);
     },
   });
 
@@ -91,26 +82,24 @@ export default function Orders() {
   const isEmpty = !loading && orderRows.length === 0;
 
   // Mutations
-  const [updateOrderStatus, { loading: statusLoading }] = useMutation(
-    UPDATE_ORDER_STATUS,
-    {
-      onCompleted: ({ updateOrderStatus }) => {
-        if (updateOrderStatus?.isSuccess) {
-          showSnackbar(updateOrderStatus.messageEn || "Status updated");
-          refetch();
-        } else {
-          showSnackbar(updateOrderStatus.messageEn || "Update failed", "error");
-        }
-      },
-      onError: (error) =>
-        showSnackbar(error.message || "Something went wrong", "error"),
-    }
-  );
+  const [updateOrderStatus, { loading: statusLoading }] = useMutation(UPDATE_ORDER_STATUS, {
+    onCompleted: (res) => {
+      const payload = res?.updateOrderStatus;
+      if (payload?.isSuccess) {
+        showSnackbar(payload.messageEn || "Status updated", "success");
+        refetch();
+      } else {
+        showSnackbar(payload?.messageEn || "Failed to update status", "error");
+      }
+    },
+    onError: (err) => showSnackbar(err.message || "Update failed", "error"),
+  });
 
   const [deleteOrderMutation] = useMutation(DELETE_ORDER, {
     onCompleted: (res) => {
+      const payload = res?.deleteOrder;
       setDeleteLoading(false);
-      showSnackbar(res.deleteOrder?.messageEn || "Order deleted");
+      showSnackbar(payload?.messageEn || "Order deleted", "success");
       refetch();
       handleCloseDeleteDialog();
     },
@@ -120,13 +109,14 @@ export default function Orders() {
     },
   });
 
-  // Debounced search
+  // Debounced search to avoid frequent requests
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
-    debounce((value) => {
+    debounce((q) => {
       setPage(1);
-      refetch({ page: 1, limit, pagination: true, keyword: value });
-    }, 500),
-    [limit, refetch]
+      refetch({ page: 1, limit, pagination: true, keyword: q, status });
+    }, 450),
+    [limit, refetch, status]
   );
 
   const handleSearchChange = (e) => {
@@ -135,65 +125,68 @@ export default function Orders() {
   };
 
   const handleLimitChange = (e) => {
-    const newLimit = Number(e.target.value);
+    const newLimit = Number(e.target.value) || 1;
     setLimit(newLimit);
     setPage(1);
-    refetch({ page: 1, limit: newLimit, pagination: true, keyword });
+    refetch({ page: 1, limit: newLimit, pagination: true, keyword, status });
   };
 
   useEffect(() => {
+    // whenever pagination or filters change, refresh
     refetch({ page, limit, pagination: true, keyword, status });
   }, [page, limit, keyword, status, refetch]);
 
-  // Drawer open/close
+  // Drawer handlers
   const handleOpenDrawer = (order = null) => {
     setSelectedOrder(order);
-    setDrawerStatus(order?.status || ""); // ✅ Set drawer local status
+    setDrawerStatus(order?.status || "");
     setEditableItems(order?.items?.map((i) => ({ ...i })) || []);
     setOpenDrawer(true);
   };
   const handleCloseDrawer = () => {
     setSelectedOrder(null);
-    setDrawerStatus(""); // ✅ reset drawer status
+    setDrawerStatus("");
     setEditableItems([]);
     setOpenDrawer(false);
   };
 
-  // Snackbar
+  // Snackbar helper
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({ open: true, message, severity });
   };
 
+  // Status change
   const handleStatusChange = (newStatus) => {
     if (!selectedOrder) return;
+
+    // Update UI immediately
+    setDrawerStatus(newStatus);
+
+    // Send correct variable name expected by your backend: `_id`
     updateOrderStatus({
-      variables: {
-        id: selectedOrder.id || selectedOrder._id,
-        status: newStatus,
-      },
+      variables: { _id: selectedOrder._id || selectedOrder.id, status: newStatus },
     });
   };
 
   const handleQuantityChange = (index, newQty) => {
     setEditableItems((prev) =>
       prev.map((item, i) =>
-        i === index
-          ? { ...item, quantity: newQty, price: item.product.price * newQty }
-          : item
+        i === index ? { ...item, quantity: newQty, price: (item.product?.price || 0) * newQty } : item
       )
     );
   };
 
-  const totalPrice = editableItems.reduce((sum, item) => sum + item.price, 0);
+  const totalPrice = editableItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
 
   const handleSaveChanges = () => {
+    // currently this UI only updates client-side items — implement mutation if backend supports item updates
     showSnackbar("Order items updated successfully!");
     refetch();
     handleCloseDrawer();
   };
 
-  const statusColor = (status) => {
-    switch (status?.toLowerCase()) {
+  const statusColor = (st) => {
+    switch ((st || "").toLowerCase()) {
       case "pending":
         return "warning";
       case "accepted":
@@ -210,30 +203,27 @@ export default function Orders() {
     }
   };
 
-  const getUserDisplay = (user, userId) =>
-    user?.username || user?.email || userId;
-  const formatOrderId = (id) =>
-    id ? `#UID-${id.slice(-6).toUpperCase()}` : "N/A";
+  const getUserDisplay = (user, userId) => user?.username || user?.email || userId;
+  const formatOrderId = (id) => (id ? `#FM-${id.slice(-6).toUpperCase()}` : "N/A");
 
-  // Delete Dialog Handlers
+  // Delete handlers
   const openDeleteDialog = (order, e) => {
     e.stopPropagation();
     setOrderToDelete(order);
     setDeleteDialogOpen(true);
   };
-
   const handleCloseDeleteDialog = () => {
     setDeleteDialogOpen(false);
     setOrderToDelete(null);
   };
-
   const handleConfirmDelete = () => {
     if (!orderToDelete) return;
     const orderId = orderToDelete._id || orderToDelete.id;
     if (!orderId) return showSnackbar("Invalid order ID", "error");
 
     setDeleteLoading(true);
-    deleteOrderMutation({ variables: { id: orderId } });
+    // backend expects `_id` param
+    deleteOrderMutation({ variables: { _id: orderId } });
   };
 
   return (
@@ -241,14 +231,7 @@ export default function Orders() {
       {/* Header */}
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Stack direction="row" spacing={2} alignItems="center">
-          <Box
-            sx={{
-              width: 5,
-              height: 28,
-              bgcolor: "success.main",
-              borderRadius: 2,
-            }}
-          />
+          <Box sx={{ width: 5, height: 28, bgcolor: "success.main", borderRadius: 2 }} />
           <Typography variant="h5" fontWeight={700}>
             Orders
           </Typography>
@@ -269,12 +252,13 @@ export default function Orders() {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <CiSearch size={22} color="#5f6368" />
+                      <CiSearch size={22} />
                     </InputAdornment>
                   ),
                 }}
               />
             </Grid>
+
             <Grid item xs={12} sm={6} md={4}>
               <Select
                 fullWidth
@@ -284,13 +268,7 @@ export default function Orders() {
                   const newStatus = e.target.value;
                   setPage(1);
                   setStatus(newStatus);
-                  refetch({
-                    page: 1,
-                    limit,
-                    pagination: true,
-                    keyword,
-                    status: newStatus,
-                  });
+                  refetch({ page: 1, limit, pagination: true, keyword, status: newStatus });
                 }}
                 displayEmpty
               >
@@ -313,9 +291,7 @@ export default function Orders() {
         <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
           <Table>
             <TableHead>
-              <TableRow
-                sx={{ bgcolor: "#a5c7e9ff", "& th": { fontWeight: 600 } }}
-              >
+              <TableRow sx={{ bgcolor: "#a5c7e9ff", "& th": { fontWeight: 600 } }}>
                 <TableCell>N&ordm;</TableCell>
                 <TableCell>Order ID</TableCell>
                 <TableCell align="left">Customer Name</TableCell>
@@ -330,52 +306,32 @@ export default function Orders() {
             {loading ? (
               <TableBody>
                 <TableRow>
-                  <TableCell colSpan={7} align="center">
+                  <TableCell colSpan={8} align="center">
                     <CircularProgress />
                   </TableCell>
                 </TableRow>
               </TableBody>
             ) : isEmpty ? (
-              <EmptyData colSpan={7} message="No orders found." />
+              <EmptyData colSpan={8} message="No orders found." />
             ) : (
               <TableBody>
                 {orderRows.map((row, index) => (
                   <TableRow
                     key={row.id || row._id || index}
                     hover
-                    sx={{
-                      "&:hover": { bgcolor: "#f5f9f6", cursor: "pointer" },
-                    }}
+                    sx={{ "&:hover": { bgcolor: "#f5f9f6", cursor: "pointer" } }}
                     onClick={() => handleOpenDrawer(row)}
                   >
                     <TableCell>{(page - 1) * limit + index + 1}</TableCell>
                     <TableCell>
-                      {row.id
-                        ? `#FM-${row.id.slice(-6).toUpperCase()}`
-                        : `#FM-${row._id?.slice(-6).toUpperCase()}`}
+                      {row.id ? `#FM-${row.id.slice(-6).toUpperCase()}` : `#FM-${row._id?.slice(-6).toUpperCase()}`}
                     </TableCell>
-                    <TableCell align="left">
-                      {row?.shippingInfo?.name}
-                    </TableCell>
-                    <TableCell align="left">
-                      {row?.shippingInfo?.email}
-                    </TableCell>
+                    <TableCell align="left">{row?.shippingInfo?.name || "N/A"}</TableCell>
+                    <TableCell align="left">{row?.shippingInfo?.email || "N/A"}</TableCell>
+                    <TableCell align="center">{row.createdAt ? dayjs(Number(row.createdAt)).format("MMM DD, YYYY - hh:mm A") : "N/A"}</TableCell>
+                    <TableCell align="center">${Number(row.totalPrice || 0).toFixed(2)}</TableCell>
                     <TableCell align="center">
-                      {row.createdAt
-                        ? dayjs(Number(row.createdAt)).format(
-                            "MMM DD, YYYY - hh:mm A"
-                          )
-                        : "N/A"}
-                    </TableCell>
-                    <TableCell align="center">
-                      ${Number(row.totalPrice || 0).toFixed(2)}
-                    </TableCell>
-                    <TableCell align="center">
-                      <Chip
-                        label={row.status}
-                        color={statusColor(row.status)}
-                        size="small"
-                      />
+                      <Chip label={row.status} color={statusColor(row.status)} size="small" />
                     </TableCell>
 
                     <TableCell align="center">
@@ -392,10 +348,7 @@ export default function Orders() {
                       </Tooltip>
 
                       <Tooltip title="Delete">
-                        <IconButton
-                          color="error"
-                          onClick={(e) => openDeleteDialog(row, e)}
-                        >
+                        <IconButton color="error" onClick={(e) => openDeleteDialog(row, e)}>
                           <Trash size={18} color="#d32f2f" />
                         </IconButton>
                       </Tooltip>
@@ -421,69 +374,28 @@ export default function Orders() {
       </Stack>
 
       {/* Drawer */}
-      <Drawer
-        anchor="right"
-        open={openDrawer}
-        onClose={handleCloseDrawer}
-        PaperProps={{
-          sx: { width: isMobile ? "100%" : 480, p: 2, overflowY: "auto" },
-        }}
-      >
+      <Drawer anchor="right" open={openDrawer} onClose={handleCloseDrawer} PaperProps={{ sx: { width: isMobile ? "100%" : 480, p: 2, overflowY: "auto" } }}>
         {selectedOrder ? (
           <Stack spacing={2}>
-            <Typography variant="h6" fontWeight={700}>
-              Order Details
-            </Typography>
+            <Typography variant="h6" fontWeight={700}>Order Details</Typography>
             <Divider />
-            <Typography>
-              User ID:{" "}
-              {getUserDisplay(
-                selectedOrder.user,
-                formatOrderId(selectedOrder?.userId || selectedOrder?._id)
-              )}
-            </Typography>
+
+            <Typography>User: {getUserDisplay(selectedOrder.user, selectedOrder.userId)}</Typography>
 
             <Box sx={{ mt: 1 }}>
               <Typography fontWeight={600}>Shipping Information:</Typography>
-              <Typography variant="body2">
-                <strong>Name:</strong>{" "}
-                {selectedOrder?.shippingInfo?.name || "N/A"}
-              </Typography>
-              <Typography variant="body2">
-                <strong>Phone:</strong>{" "}
-                {selectedOrder?.shippingInfo?.phone || "N/A"}
-              </Typography>
-              <Typography variant="body2">
-                <strong>Email:</strong>{" "}
-                {selectedOrder?.shippingInfo?.email || "N/A"}
-              </Typography>
-              <Typography variant="body2">
-                <strong>Address:</strong>{" "}
-                {selectedOrder?.shippingInfo?.address || "N/A"}
-              </Typography>
-              <Typography variant="body2">
-                <strong>Country:</strong>{" "}
-                {selectedOrder?.shippingInfo?.country || "N/A"}
-              </Typography>
+              <Typography variant="body2"><strong>Name:</strong> {selectedOrder?.shippingInfo?.name || "N/A"}</Typography>
+              <Typography variant="body2"><strong>Phone:</strong> {selectedOrder?.shippingInfo?.phone || "N/A"}</Typography>
+              <Typography variant="body2"><strong>Email:</strong> {selectedOrder?.shippingInfo?.email || "N/A"}</Typography>
+              <Typography variant="body2"><strong>Address:</strong> {selectedOrder?.shippingInfo?.address || "N/A"}</Typography>
+              <Typography variant="body2"><strong>Country:</strong> {selectedOrder?.shippingInfo?.country || "N/A"}</Typography>
             </Box>
 
             <Box sx={{ mt: 2 }}>
               <Typography fontWeight={600}>Payment Information:</Typography>
-              <Typography variant="body2">
-                <strong>Method:</strong> {selectedOrder?.paymentMethod || "N/A"}
-              </Typography>
+              <Typography variant="body2"><strong>Method:</strong> {selectedOrder?.paymentMethod || "N/A"}</Typography>
               {selectedOrder?.paymentProof && (
-                <Typography variant="body2">
-                  <strong>Payment Proof:</strong>{" "}
-                  <a
-                    href={selectedOrder.paymentProof}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: "#1976d2", textDecoration: "underline" }}
-                  >
-                    View Proof
-                  </a>
-                </Typography>
+                <Typography variant="body2"><strong>Payment Proof:</strong> <a href={selectedOrder.paymentProof} target="_blank" rel="noopener noreferrer" style={{ color: "#1976d2", textDecoration: "underline" }}>View Proof</a></Typography>
               )}
             </Box>
 
@@ -491,42 +403,28 @@ export default function Orders() {
               <Typography>Status:</Typography>
               <Select
                 size="small"
-                value={drawerStatus} // ✅ use local drawer status
+                value={drawerStatus}
                 onChange={(e) => {
                   const newStatus = e.target.value;
-                  setDrawerStatus(newStatus); // update UI immediately
-                  handleStatusChange(newStatus); // update backend
+                  setDrawerStatus(newStatus);
+                  handleStatusChange(newStatus);
                 }}
                 disabled={statusLoading}
               >
                 {statusOptions.map((s) => (
-                  <MenuItem key={s} value={s}>
-                    {s}
-                  </MenuItem>
+                  <MenuItem key={s} value={s}>{s}</MenuItem>
                 ))}
               </Select>
             </Stack>
 
             <Divider />
             <Typography fontWeight={600}>Items:</Typography>
-            <OrderDetail
-              items={editableItems}
-              onQuantityChange={handleQuantityChange}
-            />
+            <OrderDetail items={editableItems} onQuantityChange={handleQuantityChange} />
 
             <Divider />
-            <Typography fontWeight={700}>
-              Total: ${totalPrice.toFixed(2)}
-            </Typography>
+            <Typography fontWeight={700}>Total: ${totalPrice.toFixed(2)}</Typography>
 
-            <Button
-              variant="contained"
-              color="success"
-              startIcon={<SaveIcon />}
-              onClick={handleSaveChanges}
-            >
-              Save Changes
-            </Button>
+            <Button variant="contained" color="success" startIcon={<SaveIcon />} onClick={handleSaveChanges}>Save Changes</Button>
           </Stack>
         ) : (
           <CreateOrder onClose={handleCloseDrawer} refetch={refetch} />
@@ -537,24 +435,15 @@ export default function Orders() {
       <DeleteOrder
         open={deleteDialogOpen}
         title="Delete Order"
-        message={`Are you sure you want to delete order`}
-        confirmText={
-          orderToDelete
-            ? formatOrderId(orderToDelete._id || orderToDelete.id)
-            : ""
-        }
+        message={orderToDelete ? `Are you sure you want to delete order ${formatOrderId(orderToDelete._id || orderToDelete.id)}?` : "Are you sure you want to delete this order?"}
+        confirmText={orderToDelete ? formatOrderId(orderToDelete._id || orderToDelete.id) : ""}
         onClose={handleCloseDeleteDialog}
         onConfirm={handleConfirmDelete}
         loading={deleteLoading}
       />
 
       {/* Snackbar */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
+      <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={() => setSnackbar({ ...snackbar, open: false })} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
         <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
       </Snackbar>
     </Stack>
