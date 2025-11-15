@@ -14,7 +14,7 @@ import App from "./App";
 // HTTP link to GraphQL
 const httpLink = createHttpLink({
   // uri: "http://localhost:6380/graphql",
-  uri: "https://freshmart-backend-b73r.onrender.com",
+  uri: "https://freshmart-backend-b73r.onrender.com/graphql",
 });
 
 // Add auth token to headers
