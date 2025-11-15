@@ -171,7 +171,7 @@ export default function Orders() {
 
     updateOrderStatus({
       variables: {
-        _id: selectedOrder._id || selectedOrder.id,
+        id: selectedOrder._id || selectedOrder.id,
         status: newStatus,
       },
     });
