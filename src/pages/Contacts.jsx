@@ -87,10 +87,10 @@ function Contacts() {
     }, 400),
     [refetch]
   );
-// Refetch on page, limit, or keyword change
-    useEffect(() => {
-      refetch({ page, limit, pagination: true, keyword });
-    }, [page, limit, keyword, refetch]); 
+  // Refetch on page, limit, or keyword change
+  useEffect(() => {
+    refetch({ page, limit, pagination: true, keyword });
+  }, [page, limit, keyword, refetch]);
 
   useEffect(() => {
     debouncedRefetch(page, limit, keyword, subject);
@@ -111,7 +111,7 @@ function Contacts() {
     const newLimit = Number(e.target.value);
     setLimit(newLimit);
     setPage(1);
-    refetch({ page: 1 , limit: newLimit, pagination: true, keyword})
+    refetch({ page: 1, limit: newLimit, pagination: true, keyword });
   };
 
   const handlePageChange = (newPage) => setPage(newPage);
@@ -176,7 +176,7 @@ function Contacts() {
             Contacts
           </Typography>
         </Stack>
-        <Button
+        {/* <Button
           variant="contained"
           color="success"
           startIcon={<AddIcon />}
@@ -187,7 +187,7 @@ function Contacts() {
           }}
         >
           Create Contact
-        </Button>
+        </Button> */}
       </Stack>
 
       {/* Filters */}
@@ -260,7 +260,7 @@ function Contacts() {
                   </TableCell>
                 </TableRow>
               </TableBody>
-            ) : error ? ( 
+            ) : error ? (
               <TableBody>
                 <TableRow>
                   <TableCell colSpan={9} align="center" sx={{ color: "red" }}>
@@ -324,14 +324,14 @@ function Contacts() {
                             <Visibility fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Edit" arrow>
+                        {/* <Tooltip title="Edit" arrow>
                           <IconButton
                             size="small"
                             onClick={() => console.log("Edit", row)}
                           >
                             <Edit size="18" color="#1976d2" />
                           </IconButton>
-                        </Tooltip>
+                        </Tooltip> */}
                         <Tooltip title="Delete" arrow>
                           <IconButton
                             size="small"
