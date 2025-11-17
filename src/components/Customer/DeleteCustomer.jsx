@@ -11,13 +11,12 @@ import {
   Stack,
   TextField,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import { useMutation } from "@apollo/client/react";
 import { DELETE_USER } from "../../schema/User";
 import { useAuth } from "../../Context/AuthContext";
-import useSingleImageUpload from "../Hook/useSingleImageUpload";
 import DoDisturbOnOutlinedIcon from "@mui/icons-material/DoDisturbOnOutlined";
-import EmptyImage from "../../assets/Image/empty-image.png";
 
 export default function DeleteCustomer({
   userId,
@@ -31,9 +30,7 @@ export default function DeleteCustomer({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      setConfirmText("");
-    }
+    if (open) setConfirmText("");
   }, [open]);
 
   const [deleteUser] = useMutation(DELETE_USER, {
@@ -58,17 +55,16 @@ export default function DeleteCustomer({
   });
 
   const handleDelete = () => {
-    if ((confirmText || "").trim() !== (username || "").trim()) {
+    if (confirmText.trim() !== username?.trim()) {
       setAlert(true, "error", "Please type the username exactly to confirm.");
       return;
     }
-
     setLoading(true);
-    deleteUser({ variables: { id: userId } });
+    deleteUser({ variables: { _id: userId } });
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && confirmText === username && !loading) {
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && confirmText.trim() === username?.trim() && !loading) {
       handleDelete();
     }
   };
@@ -80,20 +76,12 @@ export default function DeleteCustomer({
       fullWidth
       maxWidth="xs"
       PaperProps={{
-        sx: {
-          borderRadius: 3,
-          p: 2,
-          position: "relative",
-        },
+        sx: { borderRadius: 3, p: 2, position: "relative" },
       }}
     >
       {/* Header */}
       <DialogTitle sx={{ pb: 1 }}>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-        >
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography variant="h6" fontWeight={700}>
             Delete Customer
           </Typography>
@@ -109,16 +97,15 @@ export default function DeleteCustomer({
       <DialogContent>
         <Stack spacing={2} alignItems="center">
           <Typography textAlign="center" sx={{ mt: 1 }}>
-            Are you sure you want to delete this Customer:
+            Are you sure you want to delete this Customer:{" "}
             <Typography component="span" fontWeight={600}>
-              {" "}
               {username}
             </Typography>
             ?
           </Typography>
 
           <Typography variant="body2" color="text.secondary" textAlign="center">
-            Please type the product name below to confirm deletion.
+            Please type the username below to confirm deletion.
           </Typography>
 
           <TextField
@@ -127,18 +114,12 @@ export default function DeleteCustomer({
             placeholder="Enter username"
             value={confirmText}
             onChange={(e) => setConfirmText(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyDown}
             disabled={loading}
           />
 
-          {/* Buttons */}
           <Box display="flex" gap={1} mt={1} width="100%">
-            <Button
-              variant="outlined"
-              fullWidth
-              onClick={close}
-              disabled={loading}
-            >
+            <Button variant="outlined" fullWidth onClick={close} disabled={loading}>
               Cancel
             </Button>
             <Button
@@ -146,11 +127,9 @@ export default function DeleteCustomer({
               color="error"
               fullWidth
               onClick={handleDelete}
-              disabled={
-                loading || confirmText.trim() !== username?.trim() || !username
-              }
+              disabled={loading || confirmText.trim() !== username?.trim() || !username}
             >
-              {loading ? "Deleting..." : "Delete"}
+              {loading ? <CircularProgress size={20} /> : "Delete"}
             </Button>
           </Box>
         </Stack>

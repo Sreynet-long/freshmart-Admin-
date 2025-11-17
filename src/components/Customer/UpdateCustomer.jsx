@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Drawer,
   Box,
@@ -28,26 +28,18 @@ export default function UpdateCustomer({
 }) {
   const [feedback, setFeedback] = useState({ type: "", message: "" });
 
-  // ✅ FIXED: use `_id` variable instead of `id`
   const [updateUser, { loading }] = useMutation(UPDATE_USER, {
     onCompleted: ({ updateUser }) => {
-      console.log("✅ Update response:", updateUser);
-
       if (updateUser?.isSuccess) {
         setFeedback({
           type: "success",
           message: updateUser.messageEn || "Customer updated successfully",
         });
-
-        // ✅ Refetch parent list after short delay
-        if (typeof setRefetch === "function") {
-          setTimeout(() => {
-            setRefetch();
-            handleClose();
-          }, 1000);
-        } else {
-          setTimeout(() => handleClose(), 1000);
-        }
+        // Close drawer and refetch after short delay
+        setTimeout(() => {
+          if (typeof setRefetch === "function") setRefetch();
+          handleClose();
+        }, 1000);
       } else {
         setFeedback({
           type: "error",
@@ -71,15 +63,25 @@ export default function UpdateCustomer({
 
   const validationSchema = Yup.object({
     username: Yup.string().required("Username is required"),
-    email: Yup.string().email("Invalid email format"),
+    email: Yup.string()
+      .email("Invalid email format")
+      .required("Email is required"),
     phoneNumber: Yup.string(),
   });
 
-  // ✅ Updated mutation call with `_id`
   const handleSubmit = (values) => {
+    if (!userId) {
+      setFeedback({ type: "error", message: "User ID is missing" });
+      return;
+    }
     setFeedback({ type: "", message: "" });
-    updateUser({ variables: { id: userId, input: values } });
+    updateUser({ variables: { _id: userId, input: values } });
   };
+
+  // Reset feedback when drawer opens
+  useEffect(() => {
+    if (open) setFeedback({ type: "", message: "" });
+  }, [open]);
 
   return (
     <Drawer
@@ -101,7 +103,7 @@ export default function UpdateCustomer({
         onSubmit={handleSubmit}
         enableReinitialize
       >
-        {({ values, errors, touched, handleChange, handleBlur }) => (
+        {({ values, errors, touched, handleChange, handleBlur, dirty }) => (
           <Form
             style={{ height: "100%", display: "flex", flexDirection: "column" }}
           >
@@ -154,6 +156,7 @@ export default function UpdateCustomer({
                       <TextField
                         label="Email"
                         name="email"
+                        type="email"
                         fullWidth
                         value={values.email}
                         onChange={handleChange}
@@ -178,8 +181,6 @@ export default function UpdateCustomer({
                     </Stack>
                   </Grid>
                 </Grid>
-
-                <Box sx={{ height: 80 }} />
               </Box>
             </Fade>
 
@@ -199,7 +200,7 @@ export default function UpdateCustomer({
               <Button
                 variant="contained"
                 type="submit"
-                disabled={loading || !values.username.trim()}
+                disabled={loading || !dirty || !values.username.trim()}
                 sx={{ minWidth: 120 }}
               >
                 {loading ? <CircularProgress size={24} /> : "Update"}
