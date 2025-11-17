@@ -49,7 +49,7 @@ export default function RouterComponent() {
     <LanguageProvider>
       <Routes>
         <Route path="/auth" element={<Auth />} />
-        {/* <Route path="/login" element={<Login />} /> */}
+        <Route path="/login" element={<Login />} />
         {/* <Route path="/reset-password" element={<ResetPassword />} /> */}
         <Route path="/" element={<Navigate to="/login" replace />} />
 
