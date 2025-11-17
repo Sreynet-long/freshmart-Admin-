@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { UPDATE_USER } from "../../schema/User";
 import { Formik, Form, Field } from "formik";
 import { TextField, Button, Grid, Stack } from "@mui/material";
