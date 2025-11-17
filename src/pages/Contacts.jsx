@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Stack,
@@ -28,6 +29,8 @@ import {
   DialogActions,
   Chip,
   Divider,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { CiSearch } from "react-icons/ci";
 import { Send, Visibility } from "@mui/icons-material";
@@ -54,6 +57,7 @@ export default function Contacts() {
   const [keyword, setKeyword] = useState("");
   const [subject, setSubject] = useState("");
   const [paginationData, setPaginationData] = useState({});
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   const subjects = [
     "General Inquiry",
@@ -121,12 +125,12 @@ export default function Contacts() {
     if (!replyText.trim()) return;
     try {
       await replyContact({ variables: { contactId: selectedContact.id, message: replyText } });
-      alert("Reply sent successfully!");
+      setSnackbar({ open: true, message: "Reply sent successfully!", severity: "success" });
       handleCloseView();
       refetch({ page, limit, keyword, subject });
     } catch (err) {
       console.error(err);
-      alert("Failed to send reply");
+      setSnackbar({ open: true, message: "Failed to send reply", severity: "error" });
     }
   };
 
@@ -138,18 +142,18 @@ export default function Contacts() {
   const handleDelete = async () => {
     if (!selectedContact) return;
     try {
-      const { data } = await deleteContact({ variables: { contactId: selectedContact._id } });
+      const { data } = await deleteContact({ variables: { id: selectedContact.id } });
       if (data.deleteContact.isSuccess) {
-        alert("Contact deleted successfully!");
+        setSnackbar({ open: true, message: "Contact deleted successfully!", severity: "success" });
         setDeleteDialog(false);
         setSelectedContact(null);
         refetch({ page, limit, keyword, subject });
       } else {
-        alert("Failed to delete: " + data.deleteContact.message);
+        setSnackbar({ open: true, message: "Failed to delete: " + data.deleteContact.messageEn, severity: "error" });
       }
     } catch (err) {
       console.error(err);
-      alert("Error deleting contact");
+      setSnackbar({ open: true, message: "Error deleting contact", severity: "error" });
     }
   };
 
@@ -280,7 +284,9 @@ export default function Contacts() {
         <DialogTitle fontWeight={600} color="error.main">Confirm Delete</DialogTitle>
         <Divider />
         <DialogContent>
-          <Typography>Are you sure you want to delete <strong>{selectedContact?.contactName}</strong>?</Typography>
+          <Typography>
+            Are you sure you want to delete <strong>{selectedContact?.contactName}</strong>?
+          </Typography>
         </DialogContent>
         <Divider />
         <DialogActions>
@@ -301,13 +307,32 @@ export default function Contacts() {
           <Typography mb={1}>{selectedContact?.subject}</Typography>
           <Typography variant="subtitle1" fontWeight={600}>Message:</Typography>
           <Typography mb={2}>{selectedContact?.message}</Typography>
-          <TextField fullWidth multiline minRows={3} placeholder="Type your reply..." value={replyText} onChange={(e) => setReplyText(e.target.value)} />
+          <TextField
+            fullWidth
+            multiline
+            minRows={3}
+            placeholder="Type your reply..."
+            value={replyText}
+            onChange={(e) => setReplyText(e.target.value)}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseView}>Cancel</Button>
           <Button variant="contained" color="primary" endIcon={<Send />} onClick={handleReplySubmit}>Send Reply</Button>
         </DialogActions>
       </Dialog>
+
+      {/* Snackbar */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
