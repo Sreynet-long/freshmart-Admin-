@@ -138,7 +138,7 @@ export default function Contacts() {
   const handleDelete = async () => {
     if (!selectedContact) return;
     try {
-      const { data } = await deleteContact({ variables: { contactId: selectedContact.id } });
+      const { data } = await deleteContact({ variables: { contactId: selectedContact._id } });
       if (data.deleteContact.isSuccess) {
         alert("Contact deleted successfully!");
         setDeleteDialog(false);
