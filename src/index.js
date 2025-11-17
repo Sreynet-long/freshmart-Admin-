@@ -5,7 +5,7 @@ import {
   createHttpLink,
   // ApolloProvider,
 } from "@apollo/client";
-import {ApolloProvider} from "@apollo/client/react";
+import { ApolloProvider } from "@apollo/client/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { setContext } from "@apollo/client/link/context";
 import { AuthProvider } from "./Context/AuthContext";
@@ -13,8 +13,8 @@ import App from "./App";
 
 // HTTP link to GraphQL
 const httpLink = createHttpLink({
-  // uri: "http://localhost:6380/graphql",
-  uri: "https://freshmart-backend-b73r.onrender.com/graphql",
+  uri: "http://localhost:6380/graphql",
+  // uri: "https://freshmart-backend-b73r.onrender.com/graphql",
 });
 
 // Add auth token to headers
@@ -30,7 +30,7 @@ const authLink = setContext((_, { headers }) => {
 
 const client = new ApolloClient({
   link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),   
+  cache: new InMemoryCache(),
 });
 
 const queryClient = new QueryClient();
