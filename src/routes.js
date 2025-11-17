@@ -46,7 +46,7 @@ export function ProtectedRoute({ children }) {
           style={{
             padding: 24,
             marginLeft: sidebarWidth,
-            marginTop: "25px",
+            marginTop: "28px",
             transition: "margin-left 0.3s",
           }}
         >
