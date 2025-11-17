@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   Stack,
@@ -6,21 +6,18 @@ import {
   Divider,
   IconButton,
   Tooltip,
-  useMediaQuery,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PeopleIcon from "@mui/icons-material/People";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import LoginIcon from "@mui/icons-material/Login";
-import LogoutIcon from "@mui/icons-material/Logout";
 import ContactsIcon from "@mui/icons-material/Contacts";
-import AssessmentIcon from "@mui/icons-material/Assessment";
 import SettingsIcon from "@mui/icons-material/Settings";
+import LogoutIcon from "@mui/icons-material/Logout";
 import "./Sidebar.scss";
 
+// Menu definition
 const menuItems = [
   { name: "Dashboard", path: "/", icon: <DashboardIcon /> },
   { name: "Products", path: "/products", icon: <Inventory2Icon /> },
@@ -33,20 +30,8 @@ const menuItems = [
 ];
 
 export default function Sidebar() {
-  // Collapse state
+  // Sidebar collapsed state (manual toggle only)
   const [collapsed, setCollapsed] = useState(false);
-
-  // Responsive detection
-  const isSmallScreen = useMediaQuery("(max-width:768px)");
-
-  // Automatically collapse on small screens
-  // useEffect(() => {
-  //   if (isSmallScreen) {
-  //     setCollapsed(true);
-  //   } else {
-  //     setCollapsed(false);
-  //   }
-  // }, [isSmallScreen]);
 
   const toggleSidebar = () => setCollapsed(!collapsed);
 
@@ -60,7 +45,9 @@ export default function Sidebar() {
         sx={{ p: 0.9 }}
       >
         {!collapsed && (
-          <Typography variant="h5" sx={{ fontWeight: "bold" }}></Typography>
+          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+            FreshMart
+          </Typography>
         )}
         <IconButton onClick={toggleSidebar}>
           <MenuIcon />
