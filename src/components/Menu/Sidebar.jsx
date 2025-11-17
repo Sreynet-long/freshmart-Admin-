@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import {
-  Stack,
-  Typography,
-  Divider,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
+import { Stack, Typography, Divider, IconButton, Tooltip } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
