@@ -2,13 +2,7 @@
 "use client";
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import {
-  Stack,
-  Typography,
-  Divider,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
+import { Stack, Typography, Divider, IconButton, Tooltip } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
@@ -18,7 +12,7 @@ import ContactsIcon from "@mui/icons-material/Contacts";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import "./Sidebar.scss";
-import { useAuth } from "../Context/AuthContext";   // <-- IMPORTANT!
+import { useAuth } from "../../Context/AuthContext";
 
 const menuItems = [
   { name: "Dashboard", path: "/", icon: <DashboardIcon /> },
@@ -31,16 +25,15 @@ const menuItems = [
 
 export default function Sidebar({ collapsed, toggleSidebar }) {
   const navigate = useNavigate();
-  const { logout } = useAuth();     // <--- Get logout from AuthContext
+  const { logout } = useAuth(); // <--- Get logout from AuthContext
 
   const handleLogout = () => {
-    logout();                       // <--- Clear globally
-    navigate("/auth");              // <--- redirect to login
+    logout(); // <--- Clear globally
+    navigate("/auth"); // <--- redirect to login
   };
 
   return (
     <div className={collapsed ? "sidebar collapsed" : "sidebar"}>
-      
       {/* TOP SECTION */}
       <Stack
         direction={collapsed ? "column" : "row"}
