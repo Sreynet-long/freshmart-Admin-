@@ -18,7 +18,7 @@ import Sidebar from "./components/Menu/Sidebar";
 import Navbar from "./components/Menu/Navbar";
 
 // ProtectedRoute
-export default function ProtectedRoute({ children }) {
+export function ProtectedRoute({ children }) {
   const { token } = useAuth();
   const isSmallScreen = useMediaQuery("(max-width:768px)");
 
