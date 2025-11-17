@@ -18,9 +18,8 @@ import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ContactsIcon from "@mui/icons-material/Contacts";
 import AssessmentIcon from "@mui/icons-material/Assessment";
-import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsIcon from "@mui/icons-material/Settings";
 import "./Sidebar.scss";
-
 
 const menuItems = [
   { name: "Dashboard", path: "/", icon: <DashboardIcon /> },
@@ -29,7 +28,7 @@ const menuItems = [
   { name: "Customers", path: "/customers", icon: <PeopleIcon /> },
   { name: "Contacts", path: "/contacts", icon: <ContactsIcon /> },
   // { name: "Reports", path: "/reports", icon: <AssessmentIcon /> },
-  { name: "Settings", path:"/settingAdmin", icon:<SettingsIcon/>},
+  { name: "Settings", path: "/settingAdmin", icon: <SettingsIcon /> },
   { name: "Logout", path: "/logout", icon: <LogoutIcon /> },
 ];
 
@@ -41,13 +40,13 @@ export default function Sidebar() {
   const isSmallScreen = useMediaQuery("(max-width:768px)");
 
   // Automatically collapse on small screens
-  useEffect(() => {
-    if (isSmallScreen) {
-      setCollapsed(true);
-    } else {
-      setCollapsed(false);
-    }
-  }, [isSmallScreen]);
+  // useEffect(() => {
+  //   if (isSmallScreen) {
+  //     setCollapsed(true);
+  //   } else {
+  //     setCollapsed(false);
+  //   }
+  // }, [isSmallScreen]);
 
   const toggleSidebar = () => setCollapsed(!collapsed);
 
