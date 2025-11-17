@@ -1,8 +1,9 @@
 // src/RouterComponent.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "./Context/LanguageContext";
 import { AuthProvider, useAuth } from "./Context/AuthContext";
+import { useMediaQuery } from "@mui/material";
 
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
@@ -17,12 +18,15 @@ import Auth from "./pages/Auth";
 import Sidebar from "./components/Menu/Sidebar";
 import Navbar from "./components/Menu/Navbar";
 
-// ProtectedRoute
+// ---------------------- ProtectedRoute ----------------------
 export function ProtectedRoute({ children }) {
   const { token } = useAuth();
+
+  // Detect small screen
   const isSmallScreen = useMediaQuery("(max-width:768px)");
 
-  const [collapsed, setCollapsed] = useState(false);
+  // Sidebar collapse state
+  const [collapsed, setCollapsed] = useState(isSmallScreen);
 
   useEffect(() => {
     setCollapsed(isSmallScreen); // auto collapse on small screens
@@ -53,6 +57,7 @@ export function ProtectedRoute({ children }) {
   );
 }
 
+// ---------------------- RouterComponent ----------------------
 export default function RouterComponent() {
   const protectedRoutes = [
     { path: "/dashboard", element: <Dashboard /> },
@@ -71,13 +76,18 @@ export default function RouterComponent() {
         <Routes>
           {/* Public routes */}
           <Route path="/auth" element={<Auth />} />
-          <Route path="/" element={<Navigate to="/auth" replace />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
           {/* Protected routes */}
           {protectedRoutes.map(({ path, element }) => (
-            <Route key={path} path={path} element={<ProtectedRoute>{element}</ProtectedRoute>} />
+            <Route
+              key={path}
+              path={path}
+              element={<ProtectedRoute>{element}</ProtectedRoute>}
+            />
           ))}
 
+          {/* 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </LanguageProvider>
