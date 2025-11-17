@@ -19,7 +19,7 @@ import ResetPassword from "./pages/ResetPassword";
 // ProtectedRoute wrapper
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
-  // if (!token) return <Navigate to="/auth" replace />;
+  if (!token) return <Navigate to="/auth" replace />;
   return (
     <div className="app-layout" style={{ display: "flex", height: "100vh" }}>
       <Sidebar />
@@ -50,7 +50,7 @@ export default function RouterComponent() {
       <Routes>
         <Route path="/auth" element={<Auth />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+        {/* <Route path="/reset-password" element={<ResetPassword />} /> */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
         {protectedRoutes.map(({ path, element }) => (
