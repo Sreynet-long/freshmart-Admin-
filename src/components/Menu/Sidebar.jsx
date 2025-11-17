@@ -1,7 +1,14 @@
 // Sidebar.jsx
+"use client";
 import React from "react";
-import { NavLink } from "react-router-dom";
-import { Stack, Typography, Divider, IconButton, Tooltip } from "@mui/material";
+import { NavLink, useNavigate } from "react-router-dom";
+import {
+  Stack,
+  Typography,
+  Divider,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
@@ -12,6 +19,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import "./Sidebar.scss";
 
+// Menu items except logout
 const menuItems = [
   { name: "Dashboard", path: "/", icon: <DashboardIcon /> },
   { name: "Products", path: "/products", icon: <Inventory2Icon /> },
@@ -19,10 +27,19 @@ const menuItems = [
   { name: "Customers", path: "/customers", icon: <PeopleIcon /> },
   { name: "Contacts", path: "/contacts", icon: <ContactsIcon /> },
   { name: "Settings", path: "/settingAdmin", icon: <SettingsIcon /> },
-  { name: "Logout", path: "/logout", icon: <LogoutIcon /> },
 ];
 
 export default function Sidebar({ collapsed, toggleSidebar }) {
+  const navigate = useNavigate();
+
+  // FULL LOGOUT FUNCTION
+  const handleLogout = () => {
+    localStorage.removeItem("token"); 
+    localStorage.removeItem("user");
+
+    navigate("/login"); // redirect to login
+  };
+
   return (
     <div className={collapsed ? "sidebar collapsed" : "sidebar"}>
       <Stack
@@ -43,6 +60,7 @@ export default function Sidebar({ collapsed, toggleSidebar }) {
 
       <Divider />
 
+      {/* NORMAL NAV LINKS */}
       <Stack direction="column" spacing={1} sx={{ mt: 2 }}>
         {menuItems.map((item) => (
           <NavLink
@@ -66,6 +84,26 @@ export default function Sidebar({ collapsed, toggleSidebar }) {
             </Tooltip>
           </NavLink>
         ))}
+
+        {/* LOGOUT BUTTON (NOT NAVLINK) */}
+        <div
+          className="sidebar-link"
+          onClick={handleLogout}
+          style={{ cursor: "pointer" }}
+        >
+          <Tooltip title={collapsed ? "Logout" : ""} placement="right">
+            <Stack
+              direction="row"
+              spacing={collapsed ? 0 : 1.5}
+              alignItems="center"
+              justifyContent={collapsed ? "center" : "flex-start"}
+              sx={{ width: "100%" }}
+            >
+              <LogoutIcon />
+              {!collapsed && <Typography>Logout</Typography>}
+            </Stack>
+          </Tooltip>
+        </div>
       </Stack>
     </div>
   );
