@@ -1,9 +1,7 @@
-// src/RouterComponent.jsx
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "./Context/LanguageContext";
 import { AuthProvider, useAuth } from "./Context/AuthContext";
-import { useMediaQuery } from "@mui/material";
 
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
@@ -15,80 +13,48 @@ import SettingsAdmin from "./pages/SettingAdmin";
 import Logout from "./pages/Logout";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
-import Sidebar from "./components/Menu/Sidebar";
-import Navbar from "./components/Menu/Navbar";
+import AppLayout from "./AppLayout";
 
 // ---------------------- ProtectedRoute ----------------------
 export function ProtectedRoute({ children }) {
   const { token } = useAuth();
-
-  // Detect small screen
-  const isSmallScreen = useMediaQuery("(max-width:768px)");
-
-  // Sidebar collapse state
-  const [collapsed, setCollapsed] = useState(isSmallScreen);
-
-  useEffect(() => {
-    setCollapsed(isSmallScreen); // auto collapse on small screens
-  }, [isSmallScreen]);
-
   if (!token) return <Navigate to="/auth" replace />;
-
-  const toggleSidebar = () => setCollapsed(!collapsed);
-  const sidebarWidth = collapsed ? 80 : 220;
-
-  return (
-    <div style={{ display: "flex", height: "100vh" }}>
-      <Sidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-      <div style={{ flex: 1 }}>
-        <Navbar />
-        <div
-          style={{
-            padding: 24,
-            marginLeft: sidebarWidth,
-            marginTop: "28px",
-            transition: "margin-left 0.3s",
-          }}
-        >
-          {children}
-        </div>
-      </div>
-    </div>
-  );
+  return children;
 }
 
 // ---------------------- RouterComponent ----------------------
 export default function RouterComponent() {
-  const protectedRoutes = [
-    { path: "/dashboard", element: <Dashboard /> },
-    { path: "/products", element: <Products /> },
-    { path: "/orders", element: <Orders /> },
-    { path: "/customers", element: <Customers /> },
-    { path: "/contacts", element: <Contacts /> },
-    { path: "/reports", element: <Reports /> },
-    { path: "/settingAdmin", element: <SettingsAdmin /> },
-    { path: "/logout", element: <Logout /> },
-  ];
-
   return (
     <AuthProvider>
       <LanguageProvider>
         <Routes>
-          {/* Public routes */}
+          {/* Public route */}
           <Route path="/auth" element={<Auth />} />
+
+          {/* Redirect root */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-          {/* Protected routes */}
-          {protectedRoutes.map(({ path, element }) => (
-            <Route
-              key={path}
-              path={path}
-              element={<ProtectedRoute>{element}</ProtectedRoute>}
-            />
-          ))}
-
-          {/* 404 */}
-          <Route path="*" element={<NotFound />} />
+          {/* Protected routes wrapped in persistent layout */}
+          <Route
+            path="/*"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Routes>
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="products" element={<Products />} />
+                    <Route path="orders" element={<Orders />} />
+                    <Route path="customers" element={<Customers />} />
+                    <Route path="contacts" element={<Contacts />} />
+                    <Route path="reports" element={<Reports />} />
+                    <Route path="settingAdmin" element={<SettingsAdmin />} />
+                    <Route path="logout" element={<Logout />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </LanguageProvider>
     </AuthProvider>
