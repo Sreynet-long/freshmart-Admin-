@@ -18,8 +18,8 @@ import ContactsIcon from "@mui/icons-material/Contacts";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import "./Sidebar.scss";
+import { useAuth } from "../Context/AuthContext";   // <-- IMPORTANT!
 
-// Menu items except logout
 const menuItems = [
   { name: "Dashboard", path: "/", icon: <DashboardIcon /> },
   { name: "Products", path: "/products", icon: <Inventory2Icon /> },
@@ -31,17 +31,17 @@ const menuItems = [
 
 export default function Sidebar({ collapsed, toggleSidebar }) {
   const navigate = useNavigate();
+  const { logout } = useAuth();     // <--- Get logout from AuthContext
 
-  // FULL LOGOUT FUNCTION
   const handleLogout = () => {
-    localStorage.removeItem("token"); 
-    localStorage.removeItem("user");
-
-    navigate("/login"); // redirect to login
+    logout();                       // <--- Clear globally
+    navigate("/auth");              // <--- redirect to login
   };
 
   return (
     <div className={collapsed ? "sidebar collapsed" : "sidebar"}>
+      
+      {/* TOP SECTION */}
       <Stack
         direction={collapsed ? "column" : "row"}
         alignItems="center"
@@ -53,6 +53,7 @@ export default function Sidebar({ collapsed, toggleSidebar }) {
             CMS
           </Typography>
         )}
+
         <IconButton onClick={toggleSidebar}>
           <MenuIcon />
         </IconButton>
@@ -60,7 +61,7 @@ export default function Sidebar({ collapsed, toggleSidebar }) {
 
       <Divider />
 
-      {/* NORMAL NAV LINKS */}
+      {/* MENU LINKS */}
       <Stack direction="column" spacing={1} sx={{ mt: 2 }}>
         {menuItems.map((item) => (
           <NavLink
@@ -85,7 +86,7 @@ export default function Sidebar({ collapsed, toggleSidebar }) {
           </NavLink>
         ))}
 
-        {/* LOGOUT BUTTON (NOT NAVLINK) */}
+        {/* LOGOUT BUTTON */}
         <div
           className="sidebar-link"
           onClick={handleLogout}
