@@ -16,7 +16,7 @@ import {
 import DoDisturbOnOutlinedIcon from "@mui/icons-material/DoDisturbOnOutlined";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { UPDATE_USER } from "../../schema/User";
 
 export default function UpdateCustomer({ open, handleClose, userId, user, setRefetch }) {

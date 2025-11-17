@@ -454,19 +454,24 @@ export default function Orders() {
             <Box sx={{ mt: 1 }}>
               <Typography fontWeight={600}>Shipping Information:</Typography>
               <Typography variant="body2">
-                <strong>Name:</strong> {selectedOrder?.shippingInfo?.name || "N/A"}
+                <strong>Name:</strong>{" "}
+                {selectedOrder?.shippingInfo?.name || "N/A"}
               </Typography>
               <Typography variant="body2">
-                <strong>Phone:</strong> {selectedOrder?.shippingInfo?.phone || "N/A"}
+                <strong>Phone:</strong>{" "}
+                {selectedOrder?.shippingInfo?.phone || "N/A"}
               </Typography>
               <Typography variant="body2">
-                <strong>Email:</strong> {selectedOrder?.shippingInfo?.email || "N/A"}
+                <strong>Email:</strong>{" "}
+                {selectedOrder?.shippingInfo?.email || "N/A"}
               </Typography>
               <Typography variant="body2">
-                <strong>Address:</strong> {selectedOrder?.shippingInfo?.address || "N/A"}
+                <strong>Address:</strong>{" "}
+                {selectedOrder?.shippingInfo?.address || "N/A"}
               </Typography>
               <Typography variant="body2">
-                <strong>Country:</strong> {selectedOrder?.shippingInfo?.country || "N/A"}
+                <strong>Country:</strong>{" "}
+                {selectedOrder?.shippingInfo?.country || "N/A"}
               </Typography>
             </Box>
 
@@ -518,7 +523,9 @@ export default function Orders() {
             />
 
             <Divider />
-            <Typography fontWeight={700}>Total: ${totalPrice.toFixed(2)}</Typography>
+            <Typography fontWeight={700}>
+              Total: ${totalPrice.toFixed(2)}
+            </Typography>
 
             <Button
               variant="contained"

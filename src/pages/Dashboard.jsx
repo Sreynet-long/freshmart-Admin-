@@ -112,7 +112,7 @@ export default function Dashboard() {
   };
   const outerRadius = getPieRadius(topCategoriesCount);
 
-  const revenueTarget = 600000;
+  const revenueTarget = 6000;
   const revenueProgress = Math.min(
     Math.round((stats.totalSales / revenueTarget) * 100),
     100
