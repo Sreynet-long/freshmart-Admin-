@@ -41,18 +41,21 @@ export default function RouterComponent() {
     { path: "/customers", element: <Customers /> },
     { path: "/contacts", element: <Contacts /> },
     { path: "/reports", element: <Reports /> },
-    { path: "settingAdmin", element: <SettingsAdmin /> },
+    { path: "/settingAdmin", element: <SettingsAdmin /> },
     { path: "/logout", element: <Logout /> },
   ];
 
   return (
     <LanguageProvider>
       <Routes>
-        <Route path="/auth" element={<Auth />} />
+        {/* Public routes */}
         <Route path="/login" element={<Login />} />
-        {/* <Route path="/reset-password" element={<ResetPassword />} /> */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/auth" element={<Auth />} />
 
+        {/* Default → go to login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
+        {/* Protected routes */}
         {protectedRoutes.map(({ path, element }) => (
           <Route
             key={path}
@@ -60,6 +63,7 @@ export default function RouterComponent() {
             element={<ProtectedRoute>{element}</ProtectedRoute>}
           />
         ))}
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </LanguageProvider>
