@@ -78,7 +78,7 @@ export default function UpdateCustomer({
   // ✅ Updated mutation call with `_id`
   const handleSubmit = (values) => {
     setFeedback({ type: "", message: "" });
-    updateUser({ variables: { _id: userId, input: values } });
+    updateUser({ variables: { id: userId, input: values } });
   };
 
   return (
