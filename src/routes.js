@@ -51,7 +51,7 @@ export default function RouterComponent() {
         <Route path="/auth" element={<Auth />} />
         <Route path="/login" element={<Login />} />
         {/* <Route path="/reset-password" element={<ResetPassword />} /> */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
         {protectedRoutes.map(({ path, element }) => (
           <Route
