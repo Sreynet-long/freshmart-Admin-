@@ -18,16 +18,34 @@ import Sidebar from "./components/Menu/Sidebar";
 import Navbar from "./components/Menu/Navbar";
 
 // ProtectedRoute
-function ProtectedRoute({ children }) {
-  const token = localStorage.getItem("token");
+export default function ProtectedRoute({ children }) {
+  const { token } = useAuth();
+  const isSmallScreen = useMediaQuery("(max-width:768px)");
+
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    setCollapsed(isSmallScreen); // auto collapse on small screens
+  }, [isSmallScreen]);
+
   if (!token) return <Navigate to="/auth" replace />;
 
+  const toggleSidebar = () => setCollapsed(!collapsed);
+  const sidebarWidth = collapsed ? 80 : 220;
+
   return (
-    <div className="app-layout" style={{ display: "flex", height: "100vh" }}>
-      <Sidebar />
+    <div style={{ display: "flex", height: "100vh" }}>
+      <Sidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
       <div style={{ flex: 1 }}>
         <Navbar />
-        <div style={{ padding: 24, marginLeft: 220, marginTop: "25px" }}>
+        <div
+          style={{
+            padding: 24,
+            marginLeft: sidebarWidth,
+            marginTop: "25px",
+            transition: "margin-left 0.3s",
+          }}
+        >
           {children}
         </div>
       </div>
