@@ -40,18 +40,18 @@ export default function RouterComponent() {
     { path: "/orders", element: <Orders /> },
     { path: "/customers", element: <Customers /> },
     { path: "/contacts", element: <Contacts /> },
-    { path: "/reports", element: <Reports/>},
-    { path: "settingAdmin", element: <SettingsAdmin/>},
-    { path: "/logout", element: <Logout/>},
+    { path: "/reports", element: <Reports /> },
+    { path: "settingAdmin", element: <SettingsAdmin /> },
+    { path: "/logout", element: <Logout /> },
   ];
 
   return (
     <LanguageProvider>
       <Routes>
         <Route path="/auth" element={<Auth />} />
-        <Route path="/login" element={<Login />} />
+        {/* <Route path="/login" element={<Login />} /> */}
         {/* <Route path="/reset-password" element={<ResetPassword />} /> */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
 
         {protectedRoutes.map(({ path, element }) => (
           <Route
