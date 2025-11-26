@@ -1,4 +1,3 @@
-"use client";
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -11,17 +10,18 @@ import {
   Stack,
   TextField,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import { useMutation } from "@apollo/client/react";
 import { DELETE_PRODUCT } from "../../schema/Product";
 import { useAuth } from "../../Context/AuthContext";
-import useSingleImageUpload from "../Hook/useSingleImageUpload";
 import DoDisturbOnOutlinedIcon from "@mui/icons-material/DoDisturbOnOutlined";
 import EmptyImage from "../../assets/Image/empty-image.png";
 
 export default function DeleteProduct({
   productName,
   productId,
+  imagePublicId,
   open,
   close,
   setRefetch,
@@ -31,32 +31,20 @@ export default function DeleteProduct({
   const [confirmText, setConfirmText] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const upload = useSingleImageUpload({
-    storage: "intern",
-    folder: "sreynet",
-  });
-
-  // Reset confirm text and set preview image when dialog opens
   useEffect(() => {
-    if (open) {
-      setConfirmText("");
-      upload.reset();
-      if (productImageUrl) upload.setProfileHook(productImageUrl);
-    }
-  }, [open, productImageUrl]);
+    if (open) setConfirmText("");
+  }, [open]);
 
   const [deleteProduct] = useMutation(DELETE_PRODUCT, {
     onCompleted: ({ deleteProduct }) => {
       setLoading(false);
       if (deleteProduct?.isSuccess) {
-        if (productImageUrl) upload.deleteCurrentImage();
-        upload.reset();
         setAlert(
           true,
           "success",
           deleteProduct.messageEn || "Product deleted successfully"
         );
-        if (typeof setRefetch === "function") setRefetch();
+        setRefetch?.();
         close();
       } else {
         setAlert(true, "error", deleteProduct.messageEn || "Delete failed");
@@ -69,23 +57,28 @@ export default function DeleteProduct({
   });
 
   const handleDelete = () => {
-    if ((confirmText || "").trim() !== (productName || "").trim()) {
-      setAlert(true, "error", "Please type the product name exactly to confirm.");
+    const isConfirmed =
+      confirmText.trim().toLowerCase() ===
+      (productName || "").trim().toLowerCase();
+    if (!isConfirmed) {
+      setAlert(
+        true,
+        "error",
+        "Please type the product name exactly to confirm."
+      );
       return;
     }
-
     setLoading(true);
-    deleteProduct({ variables: { id: productId } });
+    deleteProduct({
+      variables: { _id: productId, imagePublicId: imagePublicId || null },
+    });
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && confirmText === productName && !loading) {
-      handleDelete();
-    }
-  };
+  const previewImg = productImageUrl || EmptyImage;
 
-  const previewImg =
-    upload.previewUrl || upload.profileHook || productImageUrl || EmptyImage;
+  const isConfirmed =
+    confirmText.trim().toLowerCase() ===
+    (productName || "").trim().toLowerCase();
 
   return (
     <Dialog
@@ -93,17 +86,14 @@ export default function DeleteProduct({
       onClose={close}
       fullWidth
       maxWidth="xs"
-      PaperProps={{
-        sx: {
-          borderRadius: 3,
-          p: 2,
-          position: "relative",
-        },
-      }}
+      PaperProps={{ sx: { borderRadius: 3, p: 2, position: "relative" } }}
     >
-      {/* Header */}
       <DialogTitle sx={{ pb: 1 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
           <Typography variant="h6" fontWeight={700}>
             Delete Product
           </Typography>
@@ -112,13 +102,9 @@ export default function DeleteProduct({
           </IconButton>
         </Stack>
       </DialogTitle>
-
       <Divider />
-
-      {/* Content */}
       <DialogContent>
         <Stack spacing={2} alignItems="center">
-          {/* Image Preview */}
           <Box
             component="img"
             src={previewImg}
@@ -132,31 +118,24 @@ export default function DeleteProduct({
               mb: 1,
             }}
           />
-
-          <Typography textAlign="center" sx={{ mt: 1 }}>
-            Are you sure you want to delete this product:
+          <Typography textAlign="center">
+            Are you sure you want to delete{" "}
             <Typography component="span" fontWeight={600}>
-              {" "}
               {productName}
             </Typography>
             ?
           </Typography>
-
           <Typography variant="body2" color="text.secondary" textAlign="center">
             Please type the product name below to confirm deletion.
           </Typography>
-
           <TextField
             fullWidth
             size="small"
             placeholder="Enter product name"
             value={confirmText}
             onChange={(e) => setConfirmText(e.target.value)}
-            onKeyPress={handleKeyPress}
             disabled={loading}
           />
-
-          {/* Buttons */}
           <Box display="flex" gap={1} mt={1} width="100%">
             <Button
               variant="outlined"
@@ -171,14 +150,13 @@ export default function DeleteProduct({
               color="error"
               fullWidth
               onClick={handleDelete}
-              disabled={
-                loading ||
-                confirmText.trim() !== productName.trim() ||
-                !productName
-                
-              }
+              disabled={!isConfirmed || loading}
             >
-              {loading ? "Deleting..." : "Delete"}
+              {loading ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                "Delete"
+              )}
             </Button>
           </Box>
         </Stack>

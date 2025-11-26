@@ -1,102 +1,102 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDeleteImageServer } from "../UploadImage/DeleteImageServer";
+import { useState, useMemo, useCallback, useEffect } from "react";
 
-export default function useSingleImageUpload(options = {}) {
-  const { storage = "intern", folder = "sreynet" } = options;
-  const mutationDelete = useDeleteImageServer();
-
-  const [profileHook, setProfileHook] = useState(""); // Final URL to submit
-  const [imageFile, setImageFile] = useState(null); // File object
-  const [photoURL, setPhotoURL] = useState(null); // For cropping preview
+export default function useSingleImageUpload() {
+  const [imageFile, setImageFile] = useState(null);
+  const [photoURL, setPhotoURL] = useState(null);
   const [openCrop, setOpenCrop] = useState(false);
   const [statusProgress, setStatusProgress] = useState(false);
-  const [progress, setProgress] = useState(10);
-  const [imageLink, setImageLink] = useState(""); // New: direct URL input
+  const [progress, setProgress] = useState(0);
+  const [profileHook, setProfileHook] = useState(""); // final Cloudinary URL
+  const [imageLink, setImageLink] = useState("");
+  const [imagePublicId, setImagePublicId] = useState("");
 
-  //=====================IMAGE PREVIEW===================================
+  // Preview URL for local display before upload
   const previewUrl = useMemo(() => {
     if (imageFile) return URL.createObjectURL(imageFile);
-    if (imageLink) return imageLink; // Use pasted link as preview
+    if (imageLink) return imageLink;
     return null;
   }, [imageFile, imageLink]);
 
+  // Cleanup object URL when component unmounts or file changes
   useEffect(() => {
     return () => {
       if (previewUrl && imageFile) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl, imageFile]);
 
-  //========================HANDLE FILE CHANGE==========================
+  // Handle file input change
   const handleFileInputChange = useCallback((e) => {
     const file = e?.target?.files?.[0];
-    if (file) {
-      setPhotoURL(URL.createObjectURL(file));
-      setOpenCrop(true);
-    }
+    if (!file) return;
+    setPhotoURL(URL.createObjectURL(file));
+    setImageFile(file);
+    setOpenCrop(true); // open crop dialog
   }, []);
 
-  //========================EXTRACT IMAGE NAME FROM SERVER URL===========
-  const extractFileNameFromServerUrl = (url) => {
-    try {
-      const match = url.match(/fileName:([^/]+)/);
-      return match?.[1] || null;
-    } catch {
-      return null;
-    }
-  };
+  // Upload via backend (to /upload/single)
+const uploadToServer = useCallback(async (file) => {
+  if (!file) return null;
+  setStatusProgress(true);
+  setProgress(0);
 
-  //========================DELETE CURRENT IMAGE========================
-  const deleteCurrentImage = useCallback(() => {
-    if (!profileHook) return;
-    const file = extractFileNameFromServerUrl(profileHook);
-    if (!file) return;
-    mutationDelete.mutate({
-      storage,
-      folder,
-      file,
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const res = await fetch("http://localhost:6380/upload/single", {
+      method: "POST",
+      body: formData,
     });
-  }, [folder, mutationDelete, profileHook, storage]);
+    const data = await res.json();
 
-  //========================RESET HOOK===============================
+    if (data.success) {
+      const url = data.imageUrl || data.secure_url; // ✅ handle both cases
+      setProfileHook(url);
+      setImagePublicId(data.public_id);
+      setProgress(100);
+      return { imageUrl: url, publicId: data.public_id };
+    } else {
+      throw new Error(data.message || "Upload failed");
+    }
+  } catch (err) {
+    console.error("Upload error:", err);
+    throw err;
+  } finally {
+    setStatusProgress(false);
+  }
+}, []);
+  // Reset state
   const reset = useCallback(() => {
-    setProfileHook("");
     setImageFile(null);
     setPhotoURL(null);
     setOpenCrop(false);
     setStatusProgress(false);
-    setProgress(10);
+    setProgress(0);
+    setProfileHook("");
+    setImagePublicId("");
     setImageLink("");
   }, []);
 
-  //========================SET FINAL URL===============================
-  // Either the uploaded file URL or the pasted link
-  const finalProfileHook = useMemo(() => {
-    return profileHook || imageLink;
-  }, [profileHook, imageLink]);
-
   return {
-    // State
-    profileHook: finalProfileHook,
     imageFile,
     photoURL,
     openCrop,
     statusProgress,
     progress,
     previewUrl,
+    profileHook,      // ✅ final Cloudinary URL
     imageLink,
-
-    // Setters
-    setProfileHook,
-    setImageFile,
-    setPhotoURL,
-    setOpenCrop,
-    setStatusProgress,
-    setProgress,
+    imagePublicId,
     setImageLink,
-
-    // Handlers
+    setPhotoURL,
+    setImageFile,
+    setOpenCrop,
+    setProgress,
+    setStatusProgress,
     handleFileInputChange,
-    deleteCurrentImage,
+    uploadToServer,   // ✅ returns string URL
+    setProfileHook,
+    setImagePublicId,
     reset,
   };
 }

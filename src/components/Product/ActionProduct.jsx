@@ -8,6 +8,7 @@ export default function ActionProduct({
   product,
   setRefetch,
   productId,
+  imagePublicId,
   productImageUrl,
   productName,
 }) {
@@ -66,6 +67,7 @@ export default function ActionProduct({
           close={handleCloseDelete} // ✅ now defined
           productName={productName}
           productId={productId}
+          imagePublicId={imagePublicId}
           productImageUrl={productImageUrl}
           setRefetch={setRefetch}
         />

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import {
   Drawer,
   Typography,
@@ -7,63 +7,32 @@ import {
   Grid,
   TextField,
   Button,
-  Divider,
-  Stack,
-  IconButton,
   CircularProgress,
   MenuItem,
+  Fade,
+  Stack,
+  IconButton,
+  Divider,
 } from "@mui/material";
-import { CloseSquare } from "iconsax-react";
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useMutation } from "@apollo/client/react";
+import { UPDATE_PRODUCT } from "../../schema/Product";
 import { FormikProvider, useFormik } from "formik";
 import * as Yup from "yup";
+
 import CropImageFile from "../UploadImage/CropImageFile";
 import LoadingProgess from "../UploadImage/LoadingProgress";
 import EmptyImage from "../../assets/Image/empty-image.png";
 import useSingleImageUpload from "../Hook/useSingleImageUpload";
 import { useAuth } from "../../Context/AuthContext";
-import { UPDATE_PRODUCT, GET_PRODUCT_BY_ID } from "../../schema/Product";
 import DoDisturbOnOutlinedIcon from "@mui/icons-material/DoDisturbOnOutlined";
 
-export default function UpdateProduct({ open, close, product, setRefetch }) {
+export default function UpdateProduct({ open, close, setRefetch, product }) {
   const { setAlert } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [uploadedNew, setUploadedNew] = useState(false);
-  const productId = product?._id || product?.id;
 
-  const upload = useSingleImageUpload({ storage: "intern", folder: "sreynet" });
-  const initialImageRef = useRef("");
-
-  // Fetch existing product
-  const { data, loading: loadingProduct } = useQuery(GET_PRODUCT_BY_ID, {
-    variables: { id: productId },
-    skip: !productId,
-  });
-
-  useEffect(() => {
-    if (data?.getProductById?.imageUrl) {
-      initialImageRef.current = data.getProductById.imageUrl;
-      upload.setProfileHook(initialImageRef.current);
-      upload.setImageLink(initialImageRef.current);
-      setUploadedNew(false);
-    }
-  }, [data]);
-
-  const [updateProduct] = useMutation(UPDATE_PRODUCT, {
-    onCompleted: ({ updateProduct }) => {
-      setLoading(false);
-      if (updateProduct?.isSuccess) {
-        setAlert(true, "success", updateProduct.message);
-        if (typeof setRefetch === "function") setRefetch();
-        handleClose();
-      } else {
-        setAlert(true, "error", updateProduct?.message);
-      }
-    },
-    onError: (error) => {
-      setLoading(false);
-      setAlert(true, "error", error.message);
-    },
+  const upload = useSingleImageUpload({
+    storage: "cloudinary",
+    folder: "products",
   });
 
   const categories = [
@@ -77,83 +46,104 @@ export default function UpdateProduct({ open, close, product, setRefetch }) {
     "Frozen_Food",
   ];
 
-  const formik = useFormik({
-    enableReinitialize: true,
-    initialValues: {
-      productName: data?.getProductById?.productName || "",
-      category: data?.getProductById?.category || "",
-      price: data?.getProductById?.price || "",
-      // quantity: data?.getProductById?.quantity || "",
-      desc: data?.getProductById?.desc || "",
-      imageUrl: data?.getProductById?.imageUrl || "",
+  const [updateProduct] = useMutation(UPDATE_PRODUCT, {
+    onCompleted: ({ updateProduct }) => {
+      setLoading(false);
+      if (updateProduct?.isSuccess) {
+        setAlert(
+          true,
+          "success",
+          updateProduct.messageEn || "Product updated successfully"
+        );
+        formik.resetForm();
+        upload.reset();
+        close();
+        setRefetch?.();
+      } else {
+        setAlert(true, "error", updateProduct?.messageEn || "Update failed");
+      }
     },
-    validationSchema: Yup.object({
-      productName: Yup.string().required("Product name is required"),
-      category: Yup.string().required("Please select a category"),
-      price: Yup.number()
-        .typeError("Price must be a number")
-        .positive("Price must be positive")
-        .required("Price is required"),
-      // quantity: Yup.number()
-      //   .typeError("Quantity must be a number")
-      //   .required("Quantity is required"),
-      desc: Yup.string(),
-      imageUrl: Yup.mixed().nullable(),
-    }),
-    onSubmit: (values) => {
+    onError: (err) => {
+      setLoading(false);
+      setAlert(true, "error", err.message || "Something went wrong");
+    },
+  });
+
+  const validationSchema = Yup.object().shape({
+    productName: Yup.string().trim().required("Product name is required"),
+    category: Yup.string().required("Please select a category"),
+    price: Yup.number()
+      .typeError("Price must be a number")
+      .positive()
+      .required("Price is required"),
+    desc: Yup.string().nullable(),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      productName: product?.productName || "",
+      imageUrl: product?.imageUrl || "",
+      imagePublicId: product?.imagePublicId || "",
+      category: product?.category || "",
+      price: product?.price || "",
+      desc: product?.desc || "",
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      if (upload.openCrop) {
+        setAlert(true, "warning", "Please finish cropping the image first.");
+        return;
+      }
+      if (upload.progress > 0 && upload.progress < 100) {
+        setAlert(true, "warning", "Image upload is still in progress.");
+        return;
+      }
+
       setLoading(true);
-      updateProduct({
+
+      // Always send either new or old imageUrl + imagePublicId
+      const payload = {
+        productName: values.productName,
+        category: values.category,
+        price: parseFloat(values.price),
+        desc: values.desc || null,
+        imageUrl: upload.profileHook || upload.imageLink || product.imageUrl,
+        imagePublicId:
+          upload.imagePublicId !== undefined &&
+          upload.imagePublicId !== null &&
+          upload.imagePublicId !== ""
+            ? upload.imagePublicId
+            : product.imagePublicId || null,
+      };
+
+      console.log("Update payload:", payload);
+
+      await updateProduct({
         variables: {
-          id: productId,
-          input: {
-            ...values,
-            imageUrl: upload.profileHook || values.imageUrl,
-          },
+          _id: product.id,
+          input: payload,
         },
       });
     },
   });
 
-  const { values, errors, touched, getFieldProps, handleSubmit, resetForm } =
-    formik;
+  const { errors, touched, getFieldProps, handleSubmit } = formik;
 
-  useEffect(() => {
-    if (upload.profileHook && initialImageRef.current !== upload.profileHook) {
-      setUploadedNew(true);
-    }
-  }, [upload.profileHook]);
-
-  // Auto-preview when URL pasted
-  useEffect(() => {
-    if (upload.imageLink && upload.imageLink.startsWith("http")) {
-      upload.setProfileHook(upload.imageLink);
-    }
-  }, [upload.imageLink]);
-
-  const handleClose = () => {
-    if (uploadedNew) upload.deleteCurrentImage?.();
-    setUploadedNew(false);
-    resetForm();
+  const handleCloseAction = () => {
+    formik.resetForm();
+    upload.reset();
     close?.();
   };
-
-  const displayImage =
-    upload.previewUrl || upload.profileHook || values.imageUrl || EmptyImage;
-
-  if (!product || loadingProduct) return null;
 
   return (
     <Drawer
       anchor="right"
       open={open}
-      onClose={handleClose}
       PaperProps={{
         sx: {
           width: { xs: "100%", sm: 650 },
           borderRadius: { xs: 0, sm: "12px 0 0 12px" },
           overflow: "hidden",
-          bgcolor: "background.paper",
-          boxShadow: 4,
         },
       }}
     >
@@ -163,132 +153,139 @@ export default function UpdateProduct({ open, close, product, setRefetch }) {
           style={{ height: "100%", display: "flex", flexDirection: "column" }}
         >
           {/* Header */}
-          <Box sx={{ p: 2, borderBottom: "1px solid", borderColor: "divider" }}>
+          <Box
+            sx={{
+              p: 2,
+              borderBottom: "1px solid",
+              borderColor: "divider",
+              bgcolor: "background.default",
+            }}
+          >
             <Stack
               direction="row"
               justifyContent="space-between"
               alignItems="center"
             >
-              <Typography variant="h6">Update Product</Typography>
-              <IconButton onClick={handleClose} sx={{ color: "red" }}>
+              <Typography variant="h6" fontWeight="bold">
+                Update Product
+              </Typography>
+              <IconButton onClick={handleCloseAction} sx={{ color: "red" }}>
                 <DoDisturbOnOutlinedIcon fontSize="small" />
               </IconButton>
             </Stack>
           </Box>
 
           {/* Content */}
-          <Box sx={{ flex: 1, overflowY: "auto", px: 3, py: 2 }}>
-            <Grid container spacing={3}>
-              {/* Image Section */}
-              <Grid item xs={12} md={5}>
-                <Stack spacing={2} alignItems="center">
-                  {!upload.openCrop ? (
-                    <Button component="label">
-                      <input
-                        type="file"
-                        hidden
-                        accept="image/*"
-                        onChange={upload.handleFileInputChange}
+          <Fade in={open} timeout={500}>
+            <Box sx={{ flex: 1, overflowY: "auto", px: 3, py: 2 }}>
+              <Grid container spacing={3}>
+                {/* Image */}
+                <Grid item xs={12} md={5}>
+                  <Typography variant="subtitle1" fontWeight={600}>
+                    Product Image
+                  </Typography>
+                  <Divider sx={{ my: 1 }} />
+                  <Stack spacing={2} alignItems="center">
+                    {!upload.openCrop ? (
+                      <Button component="label" sx={{ width: "100%" }}>
+                        <input
+                          type="file"
+                          hidden
+                          accept="image/*"
+                          onChange={upload.handleFileInputChange}
+                        />
+                        <img
+                          src={
+                            upload.previewUrl || product.imageUrl || EmptyImage
+                          }
+                          alt="product"
+                          style={{
+                            width: "210px",
+                            height: "230px",
+                            borderRadius: 12,
+                            objectFit: "cover",
+                            backgroundColor: "#fff",
+                            border: "1px solid #ddd",
+                            cursor: "pointer",
+                          }}
+                        />
+                      </Button>
+                    ) : (
+                      <CropImageFile
+                        uploadImage={upload.uploadToServer}
+                        setProgress={upload.setProgress}
+                        setStatusProgress={upload.setStatusProgress}
+                        openCrop={upload.openCrop}
+                        setOpenCrop={upload.setOpenCrop}
+                        photoURL={upload.photoURL}
+                        setPhotoURL={upload.setPhotoURL}
+                        setImageFile={upload.setImageFile}
+                        setProfileHook={upload.setProfileHook}
+                        setImagePublicId={upload.setImagePublicId}
                       />
-                      <img
-                        src={displayImage}
-                        alt="product"
-                        style={{
-                          width: "210px",
-                          height: "230px",
-                          borderRadius: "12px",
-                          objectFit: "cover",
-                          border: "1px solid #ddd",
-                          cursor: "pointer",
-                        }}
+                    )}
+                    {upload.statusProgress && upload.progress < 100 && (
+                      <LoadingProgess
+                        progress={upload.progress}
+                        setProgress={upload.setProgress}
                       />
-                    </Button>
-                  ) : (
-                    <CropImageFile
-                      openCrop={upload.openCrop}
-                      setOpenCrop={upload.setOpenCrop}
-                      photoURL={upload.photoURL}
-                      setPhotoURL={upload.setPhotoURL}
-                      setImageFile={upload.setImageFile}
-                      setProfileHook={upload.setProfileHook}
-                      setProgress={upload.setProgress}
-                      setStatusProgress={upload.setStatusProgress}
+                    )}
+                    <TextField
+                      fullWidth
+                      size="small"
+                      label="Or paste image URL"
+                      value={upload.imageLink}
+                      onChange={(e) => upload.setImageLink(e.target.value)}
                     />
-                  )}
+                  </Stack>
+                </Grid>
 
-                  {upload.statusProgress && upload.progress < 100 && (
-                    <LoadingProgess
-                      progress={upload.progress}
-                      setProgress={upload.setProgress}
+                {/* Details */}
+                <Grid item xs={12} md={7}>
+                  <Typography variant="subtitle1" fontWeight={600}>
+                    Product Details
+                  </Typography>
+                  <Divider sx={{ my: 1 }} />
+                  <Stack spacing={2}>
+                    <TextField
+                      label="Product Name"
+                      {...getFieldProps("productName")}
+                      error={touched.productName && Boolean(errors.productName)}
+                      helperText={touched.productName && errors.productName}
                     />
-                  )}
-
-                  {/* Paste Image URL */}
-                  <TextField
-                    fullWidth
-                    size="small"
-                    variant="outlined"
-                    label="Or paste image URL"
-                    placeholder="https://example.com/image.jpg"
-                    value={upload.imageLink}
-                    onChange={(e) => upload.setImageLink(e.target.value)}
-                  />
-                </Stack>
+                    <TextField
+                      select
+                      label="Category"
+                      {...getFieldProps("category")}
+                      error={touched.category && Boolean(errors.category)}
+                      helperText={touched.category && errors.category}
+                    >
+                      {categories.map((cat) => (
+                        <MenuItem key={cat} value={cat}>
+                          {cat.replaceAll("_", " ")}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                    <TextField
+                      label="Price"
+                      type="number"
+                      {...getFieldProps("price")}
+                      error={touched.price && Boolean(errors.price)}
+                      helperText={touched.price && errors.price}
+                      inputProps={{ min: 0, step: "0.01" }}
+                    />
+                    <TextField
+                      label="Description"
+                      multiline
+                      minRows={4}
+                      {...getFieldProps("desc")}
+                    />
+                  </Stack>
+                </Grid>
               </Grid>
-
-              {/* Product Info */}
-              <Grid item xs={12} md={7}>
-                <Stack spacing={2}>
-                  <TextField
-                    fullWidth
-                    label="Product Name"
-                    {...getFieldProps("productName")}
-                    error={touched.productName && Boolean(errors.productName)}
-                    helperText={touched.productName && errors.productName}
-                  />
-                  <TextField
-                    select
-                    fullWidth
-                    label="Category"
-                    {...getFieldProps("category")}
-                    error={touched.category && Boolean(errors.category)}
-                    helperText={touched.category && errors.category}
-                  >
-                    {categories.map((cat) => (
-                      <MenuItem key={cat} value={cat}>
-                        {cat.replaceAll("_", " ")}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  <TextField
-                    fullWidth
-                    label="Price"
-                    type="number"
-                    {...getFieldProps("price")}
-                    error={touched.price && Boolean(errors.price)}
-                    helperText={touched.price && errors.price}
-                  />
-                  {/* <TextField
-                    fullWidth
-                    label="Quantity"
-                    type="number"
-                    {...getFieldProps("quantity")}
-                    error={touched.quantity && Boolean(errors.quantity)}
-                    helperText={touched.quantity && errors.quantity}
-                  /> */}
-                  <TextField
-                    fullWidth
-                    label="Description"
-                    multiline
-                    minRows={4}
-                    {...getFieldProps("desc")}
-                    error={touched.desc && Boolean(errors.desc)}
-                    helperText={touched.desc && errors.desc}
-                  />
-                </Stack>
-              </Grid>
-            </Grid>
-          </Box>
+              <Box sx={{ height: 70 }} />
+            </Box>
+          </Fade>
 
           {/* Footer */}
           <Box
@@ -300,10 +297,17 @@ export default function UpdateProduct({ open, close, product, setRefetch }) {
               justifyContent: "space-between",
             }}
           >
-            <Button onClick={handleClose} disabled={loading}>
+            <Button onClick={handleCloseAction} disabled={loading}>
               Cancel
             </Button>
-            <Button variant="contained" type="submit" disabled={loading}>
+            <Button
+              variant="contained"
+              type="submit"
+              sx={{ minWidth: 130 }}
+              disabled={
+                loading || (upload.progress > 0 && upload.progress < 100)
+              }
+            >
               {loading ? <CircularProgress size={24} /> : "Update"}
             </Button>
           </Box>

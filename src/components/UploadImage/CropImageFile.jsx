@@ -1,79 +1,84 @@
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import CloseIcon from '@mui/icons-material/Close';
-import DialogTitle from "@mui/material/DialogTitle";
-import imageCompression from "browser-image-compression";
-import CropIcon from "@mui/icons-material/Crop";
-import Dialog from "@mui/material/Dialog";
-import { Cancel } from "@mui/icons-material";
-import Cropper from "react-easy-crop";
-import { Box, Button, IconButton, Slider, Stack, Typography } from "@mui/material";
-import moment from "moment";
 import React, { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-
-import "./cropimagefile.scss";
-import getCroppedImg from "./Crop";
+import { Dialog, Box, Button, Stack } from "@mui/material";
+import Cropper from "react-easy-crop";
+import getCroppedImg from "./Crop"; // your helper function
 
 export default function CropImageFile({
-  setProgress,
-  setStatusProgress,
+  uploadImage,          // hook's upload function (uploadToServer)
+  setProfileHook,       // hook state setter
+  setImagePublicId,
   openCrop,
   setOpenCrop,
   photoURL,
   setPhotoURL,
   setImageFile,
-  setProfileHook,
+  setProgress,
+  setStatusProgress,
 }) {
-  const [loading, setLoading] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const newDate = moment(new Date()).format("MMdYYYY");
-  const cropComplete = (croppedArea, croppedAreaPixels) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  };
+  const cropComplete = (_, croppedPixels) => setCroppedAreaPixels(croppedPixels);
 
-  const cropImage = async () => {
-    try {
-      const { file, url } = await getCroppedImg(photoURL, croppedAreaPixels, rotation);
-      setLoading(true);
-      setTimeout(() => {
-        setPhotoURL(url);
-        setImageFile(file);
-        setOpenCrop(false);
-        setStatusProgress(true);
-        setProgress(10);
-        uploadImage(file);
-        setLoading(false);
-      }, 1000);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+const handleCropAndUpload = async () => {
+  if (!croppedAreaPixels) return;
 
-  const uploadImage = async (file) => {
-    if (!file) return;
-    const options = {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 1920,
-      useWebWorker: true,
-    };
-    const compressedFile = await imageCompression(file, options);
-    let newName = `${uuidv4()}${newDate}${file.name.split(".").pop()}`;
-    var newFile = new File([compressedFile], `${newName}.png`, {
-      type: "image/png",
-    });
-    setProfileHook(`${process.env.REACT_APP_IMAGE_SERVER}${newName}.png${process.env.REACT_APP_IMAGE_URL}`);
-  };
+  try {
+    setLoading(true);
+    const { file, url } = await getCroppedImg(photoURL, croppedAreaPixels, rotation);
+    setPhotoURL(url);
+    setImageFile(file);
+    setOpenCrop(false);
+
+    setStatusProgress(true);
+    setProgress(0);
+
+    const { imageUrl, publicId } = await uploadImage(file);
+
+    setProfileHook(imageUrl);
+    setImagePublicId(publicId);
+
+    setProgress(100);
+    setStatusProgress(false);
+  } catch (err) {
+    console.error("Upload failed:", err);
+    setStatusProgress(false);
+    setProgress(0);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   return (
-    <Dialog open={openCrop} fullWidth maxWidth="sm" className="crop-container">
-      {/* rest of your dialog code unchanged */}
+    <Dialog open={openCrop} fullWidth maxWidth="sm">
+      <Box sx={{ p: 2, height: 400, position: "relative" }}>
+        <Cropper
+          image={photoURL}
+          crop={crop}
+          zoom={zoom}
+          rotation={rotation}
+          aspect={1}
+          onCropChange={setCrop}
+          onCropComplete={cropComplete}
+          onZoomChange={setZoom}
+          style={{
+            containerStyle: {
+              backgroundColor: "#fff", 
+            },
+          }}
+        />
+      </Box>
+      <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ p: 2 }}>
+        <Button onClick={() => setOpenCrop(false)}>Cancel</Button>
+        <Button variant="contained" onClick={handleCropAndUpload} disabled={loading}>
+          {loading ? "Processing..." : "Crop & Upload"}
+        </Button>
+      </Stack>
     </Dialog>
   );
 }
-
-const zoomPercent = (value) => `${Math.round(value * 100)}%`;
