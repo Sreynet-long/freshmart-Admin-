@@ -113,6 +113,12 @@ export default function CreateProduct({ open, close, setRefetch }) {
         return;
       }
 
+      // ✅ Require at least one image source
+      if (!upload.profileHook && !upload.imageLink) {
+        setAlert(true, "Warning", "Please upload an image or paste a link.");
+        return;
+      }
+
       setLoading(true);
 
       const payload = {
@@ -120,12 +126,14 @@ export default function CreateProduct({ open, close, setRefetch }) {
         category: values.category,
         price: parseFloat(values.price),
         desc: values.desc || null,
-        imageUrl: upload.profileHook || upload.imageLink || null,
-        imagePublicId: upload.imagePublicId || null,
+        imageUrl: upload.profileHook || upload.imageLink,   // ✅ guaranteed non-null
+        imagePublicId: upload.imagePublicId || null,        // ✅ null if link
       };
+
       console.log("Payload being sent:", payload);
       await createProduct({ variables: { input: payload } });
-    },
+    }
+
   });
 
   const { values, errors, touched, getFieldProps, handleSubmit } = formik;

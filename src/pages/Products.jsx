@@ -263,10 +263,7 @@ export default function Products() {
                     <TableCell align="center">
                       <ActionProduct
                         product={row}
-                        productId={row?.id}
-                        productName={row?.productName}
                         setRefetch={refetch}
-                        productImageUrl={row?.imageUrl}
                       />
                     </TableCell>
                   </TableRow>

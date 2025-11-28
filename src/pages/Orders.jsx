@@ -79,7 +79,13 @@ export default function Orders() {
 
   // Queries
   const { data, loading, refetch } = useQuery(GET_ORDER_WITH_PAGINATION, {
-    variables: { page, limit, pagination: true, keyword, status: "" },
+    variables: {
+      page,
+      limit,
+      pagination: true,
+      keyword,
+      status: status === "" ? null : status,
+    },
     fetchPolicy: "network-only",
     onCompleted: ({ getOrdersWithPagination }) => {
       setPaginationState(getOrdersWithPagination?.paginator || {});
@@ -131,7 +137,13 @@ export default function Orders() {
   };
 
   useEffect(() => {
-    refetch({ page, limit, pagination: true, keyword, status });
+    refetch({
+      page,
+      limit,
+      pagination: true,
+      keyword,
+      status: status === "" ? null : status,
+    });
   }, [page, limit, keyword, status, refetch]);
 
   // Drawer handlers

@@ -77,6 +77,10 @@ export default async function getCroppedImg(
   canvas.width = pixelCrop.width;
   canvas.height = pixelCrop.height;
 
+  // ✅ Fill again with white after resize
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
   // paste generated rotate image at the top left corner
   ctx.putImageData(data, 0, 0);
 
@@ -87,8 +91,8 @@ export default async function getCroppedImg(
   return new Promise((resolve, reject) => {
     canvas.toBlob((file) => {
       // console.log("file::", file)
-      file.name = "cropped.jpeg";
+      file.name = "cropped.png";
       resolve({ file: file, url: URL.createObjectURL(file) });
-    }, "image/jpeg");
+    }, "image/png");
   });
 }

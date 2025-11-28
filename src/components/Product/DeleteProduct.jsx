@@ -60,6 +60,7 @@ export default function DeleteProduct({
     const isConfirmed =
       confirmText.trim().toLowerCase() ===
       (productName || "").trim().toLowerCase();
+
     if (!isConfirmed) {
       setAlert(
         true,
@@ -68,14 +69,20 @@ export default function DeleteProduct({
       );
       return;
     }
+
     setLoading(true);
+
+    console.log("Delete variables:", { _id: productId, imagePublicId });
+
     deleteProduct({
-      variables: { _id: productId, imagePublicId: imagePublicId || null },
+      variables: {
+        _id: productId,
+        imagePublicId,
+      },
     });
   };
 
   const previewImg = productImageUrl || EmptyImage;
-
   const isConfirmed =
     confirmText.trim().toLowerCase() ===
     (productName || "").trim().toLowerCase();

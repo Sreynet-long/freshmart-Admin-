@@ -4,14 +4,7 @@ import { Edit, Trash } from "iconsax-react";
 import UpdateProduct from "./UpdateProduct";
 import DeleteProduct from "./DeleteProduct";
 
-export default function ActionProduct({
-  product,
-  setRefetch,
-  productId,
-  imagePublicId,
-  productImageUrl,
-  productName,
-}) {
+export default function ActionProduct({ product, setRefetch }) {
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
@@ -64,11 +57,11 @@ export default function ActionProduct({
       {openDelete && (
         <DeleteProduct
           open={openDelete}
-          close={handleCloseDelete} // ✅ now defined
-          productName={productName}
-          productId={productId}
-          imagePublicId={imagePublicId}
-          productImageUrl={productImageUrl}
+          close={handleCloseDelete}
+          productName={product.productName}
+          productId={product.id}
+          imagePublicId={product.imagePublicId}
+          productImageUrl={product.imageUrl}
           setRefetch={setRefetch}
         />
       )}

@@ -1,42 +1,33 @@
 import { gql } from "@apollo/client";
 
 export const GET_PRODUCT_WITH_PAGINATION = gql`
-  query GetProductWithPagination(
-    $page: Int
-    $limit: Int
-    $pagination: Boolean
-    $keyword: String
-    $category: Category
-  ) {
-    getProductWithPagination(
-      page: $page
-      limit: $limit
-      pagination: $pagination
-      keyword: $keyword
-      category: $category
-    ) {
-      data {
-        id
-        productName
-        category
-        imageUrl
-        desc
-        price
-      }
-      paginator {
-        slNo
-        prev
-        next
-        perPage
-        totalPosts
-        totalPages
-        currentPage
-        hasPrevPage
-        hasNextPage
-        totalDocs
-      }
+query GetProductWithPagination($page: Int, $limit: Int, $pagination: Boolean, $category: Category, $keyword: String) {
+  getProductWithPagination(page: $page, limit: $limit, pagination: $pagination, category: $category, keyword: $keyword) {
+    data {
+      id
+      productName
+      category
+      imageUrl
+      imagePublicId
+      desc
+      price
+      averageRating
+      reviewsCount
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
     }
   }
+}
 `;
 export const GET_PRODUCT_BY_CATEGORY = gql`
   query GetProductsByCategory($category: Category!) {
@@ -136,22 +127,22 @@ export const UPDATE_PRODUCT = gql`
   }
 `;
 export const DELETE_PRODUCT = gql`
-  mutation DeleteProduct($_id: ID!, $imagePublicId: String) {
-    deleteProduct(_id: $_id, imagePublicId: $imagePublicId) {
-      isSuccess
-      messageEn
-      messageKh
-      product {
-        id
-        productName
-        category
-        imageUrl
-        imagePublicId
-        desc
-        price
-        averageRating
-        reviewsCount
-      }
+mutation DeleteProduct($_id: ID!, $imagePublicId: String) {
+  deleteProduct(_id: $_id, imagePublicId: $imagePublicId) {
+    isSuccess
+    messageEn
+    messageKh
+    product {
+      id
+      productName
+      category
+      imageUrl
+      imagePublicId
+      desc
+      price
+      averageRating
+      reviewsCount
     }
   }
+}
 `;
