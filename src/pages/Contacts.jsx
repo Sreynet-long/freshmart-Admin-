@@ -34,6 +34,7 @@ import { Add as AddIcon, Visibility, Send } from "@mui/icons-material";
 import { useQuery, useMutation } from "@apollo/client/react";
 import { GET_CONTACT_WITH_PAGINATION } from "../schema/Contact";
 import { REPLY_CONTACT } from "../schema/Contact";
+import { DELETE_CONTACT } from "../schema/Contact";
 import FooterPagination from "../components/include/FooterPagination";
 import EmptyData from "../components/include/EmptyData";
 import debounce from "lodash.debounce";
@@ -71,6 +72,7 @@ function Contacts() {
   );
 
   const [replyContact] = useMutation(REPLY_CONTACT);
+  const [deleteContact] = useMutation(DELETE_CONTACT);
 
   const contactRows = data?.getContactWithPagination?.data || [];
   const isEmpty = !loading && contactRows.length === 0;
@@ -147,11 +149,20 @@ function Contacts() {
     setDeleteDialog(true);
   };
 
-  const handleDelete = () => {
-    console.log("Deleted:", selectedContact);
-    setDeleteDialog(false);
-    setSelectedContact(null);
-    refetch({ page, limit, keyword, subject });
+  const handleDelete = async () => {
+    try{
+      await deleteContact ({
+        variables: { _id: selectedContact.id },
+      })
+      alert("Contact deleted successfully!");
+      console.log("Deleted:", selectedContact);
+      setDeleteDialog(false);
+      setSelectedContact(null);
+      refetch({ page, limit, keyword, subject });
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete contact");
+    }
   };
 
   return (
@@ -331,7 +342,7 @@ function Contacts() {
                           >
                             <Edit size="18" color="#1976d2" />
                           </IconButton>
-                        </Tooltip>
+                        </Tooltip> */}
                         <Tooltip title="Delete" arrow>
                           <IconButton
                             size="small"
@@ -339,7 +350,7 @@ function Contacts() {
                           >
                             <Trash size="18" color="#d32f2f" />
                           </IconButton>
-                        </Tooltip> */}
+                        </Tooltip>
                       </Stack>
                     </TableCell>
                   </TableRow>

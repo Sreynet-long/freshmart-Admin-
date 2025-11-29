@@ -207,7 +207,7 @@ export default function Products() {
         </CardContent>
       </Card>
 
-      {/* TABLE */}
+      {/* TABLE */} 
       <Card elevation={2} sx={{ borderRadius: 3 }}>
         <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
           <Table>

@@ -61,8 +61,8 @@ export const REPLY_CONTACT = gql`
   }
 `;
 export const DELETE_CONTACT = gql`
-  mutation DeleteContact($id: ID!) {
-    deleteContact(_id: $id) {
+  mutation DeleteContact($_id: ID!) {
+    deleteContact(_id: $_id) {
       isSuccess
       messageKh
       messageEn

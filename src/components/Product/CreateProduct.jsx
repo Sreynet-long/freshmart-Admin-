@@ -27,6 +27,7 @@ import useSingleImageUpload from "../Hook/useSingleImageUpload";
 import { useAuth } from "../../Context/AuthContext";
 import DoDisturbOnOutlinedIcon from "@mui/icons-material/DoDisturbOnOutlined";
 
+
 export default function CreateProduct({ open, close, setRefetch }) {
   const { setAlert } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -241,13 +242,13 @@ export default function CreateProduct({ open, close, setRefetch }) {
                       />
                     )}
 
-                    <TextField
+                    {/* <TextField
                       fullWidth
                       size="small"
                       label="Or paste image URL"
                       value={upload.imageLink}
                       onChange={(e) => upload.setImageLink(e.target.value)}
-                    />
+                    /> */}
                   </Stack>
                 </Grid>
 
