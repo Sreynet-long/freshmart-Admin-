@@ -37,7 +37,7 @@ const EmptyData = () => {
                   <img
                     className="box-image"
                     src={emptybox}
-                    alt={emptybox}
+                    alt="emptybox"
                     style={{ width: "80px", height: "80px" }}
                   />
                 </Box>
