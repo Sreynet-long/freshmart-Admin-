@@ -64,9 +64,6 @@ function Contacts() {
     GET_CONTACT_WITH_PAGINATION,
     {
       variables: { page, limit, keyword, subject },
-      onCompleted: (res) => {
-        setPaginationData(res?.getContactWithPagination?.paginator || {});
-      },
       fetchPolicy: "network-only",
     }
   );
@@ -74,29 +71,23 @@ function Contacts() {
   const [replyContact] = useMutation(REPLY_CONTACT);
   const [deleteContact] = useMutation(DELETE_CONTACT);
 
+  const paginator = data?.getContactWithPagination?.paginator || {totalPages: 1 , totalDocs: 0};
   const contactRows = data?.getContactWithPagination?.data || [];
   const isEmpty = !loading && contactRows.length === 0;
 
-  // --- Debounced Refetch ---
-  const debouncedRefetch = useCallback(
-    debounce((newPage, newLimit, newKeyword, newSubject) => {
-      refetch({
-        page: newPage,
-        limit: newLimit,
-        keyword: newKeyword,
-        subject: newSubject,
-      });
+ // --- Debounced search ---
+  const debouncedSearch = useCallback(
+    debounce((val) => {
+      setPage(1);
+      setKeyword(val);
     }, 400),
-    [refetch]
+    []
   );
-// Refetch on page, limit, or keyword change
-    useEffect(() => {
-      refetch({ page, limit, pagination: true, keyword });
-    }, [page, limit, keyword, refetch]); 
 
+  // 🔥 Unified refetch effect
   useEffect(() => {
-    debouncedRefetch(page, limit, keyword, subject);
-  }, [page, limit, keyword, subject, debouncedRefetch]);
+    refetch({ page, limit, keyword, subject });
+  }, [page, limit, keyword, subject, refetch]);
 
   // --- Handlers ---
   const handleSearchChange = (e) => {
@@ -109,11 +100,9 @@ function Contacts() {
     setSubject(e.target.value);
   };
 
-  const handleLimitChange = (e) => {
-    const newLimit = Number(e.target.value);
-    setLimit(newLimit);
+   const handleLimitChange = (e) => {
+    setLimit(Number(e.target.value));
     setPage(1);
-    refetch({ page: 1 , limit: newLimit, pagination: true, keyword})
   };
 
   const handlePageChange = (newPage) => setPage(newPage);
@@ -368,8 +357,8 @@ function Contacts() {
           limit={limit}
           setPage={handlePageChange}
           handleLimit={handleLimitChange}
-          totalDocs={paginationData?.totalDocs}
-          totalPages={paginationData?.totalPages}
+          totalDocs={paginator.totalDocs}
+          totalPages={paginator.totalPages}
         />
       </Stack>
 
