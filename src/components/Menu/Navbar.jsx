@@ -147,7 +147,7 @@ export default function Navbar() {
               }}
             >
               
-              Logged in as: ${username}
+              Logged in as: {username}
             </Typography>
             <Divider />
             <MenuItem onClick={handleLogout}>
