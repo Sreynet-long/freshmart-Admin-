@@ -146,14 +146,13 @@ export default function Navbar() {
                 borderBottom: "1px solid #eee",
               }}
             >
-              {language === "kh"
-                ? `អ្នកប្រើប្រាស់៖ ${username}`
-                : `Logged in as: ${username}`}
+              
+              Logged in as: ${username}
             </Typography>
             <Divider />
             <MenuItem onClick={handleLogout}>
               <IoLogOutOutline style={{ marginRight: 8 }} />
-              {language === "kh" ? "ចាកចេញ" : "Logout"}
+              Logout
             </MenuItem>
           </Menu>
         </Stack>
