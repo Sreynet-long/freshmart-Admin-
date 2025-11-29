@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   Stack,
   Button,
@@ -22,7 +22,6 @@ import {
   Card,
   CardContent,
   Avatar,
-  useMediaQuery,
 } from "@mui/material";
 import { CiSearch } from "react-icons/ci";
 import { Add as AddIcon } from "@mui/icons-material";
@@ -41,11 +40,6 @@ export default function Products() {
   const [limit, setLimit] = useState(5);
   const [keyword, setKeyword] = useState("");
   const [category, setCategory] = useState("");
-  const [paginationData, setPaginationData] = useState({});
-  const isMobile = useMediaQuery("(max-width:600px)");
-
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
 
   const categories = [
     "Vegetable",
@@ -58,7 +52,7 @@ export default function Products() {
     "Frozen_Food",
   ];
 
-  // Fetch products with pagination
+  // Query
   const { data, loading, refetch } = useQuery(GET_PRODUCT_WITH_PAGINATION, {
     variables: {
       page,
@@ -68,66 +62,48 @@ export default function Products() {
       ...(category ? { category } : {}),
     },
     fetchPolicy: "network-only",
-
-    onCompleted: ({ getProductWithPagination }) => {
-      const paginator = getProductWithPagination?.paginator || {};
-      setPaginationData(paginator);
-
-      // 🔥 Auto-fix if page > totalPages
-      if (page > paginator.totalPages && paginator.totalPages > 0) {
-        setPage(1);
-      }
-    },
   });
+
+  const paginator = data?.getProductWithPagination?.paginator || {
+    totalPages: 1,
+    totalDocs: 0,
+  };
+  const productRows = data?.getProductWithPagination?.data || [];
+  const isEmpty = !loading && productRows.length === 0;
 
   // Debounced search
   const debouncedSearch = useCallback(
     debounce((val) => {
       setPage(1);
-      refetch({
-        page: 1,
-        limit,
-        pagination: true,
-        keyword: val,
-        ...(category ? { category } : {}),
-      });
+      setKeyword(val);
     }, 500),
-    [limit, category, refetch]
+    []
   );
 
   const handleSearchChange = (e) => {
-    setKeyword(e.target.value);
     debouncedSearch(e.target.value);
   };
 
   const handleCategoryChange = (e) => {
-    const value = e.target.value;
-    setCategory(value);
+    setCategory(e.target.value);
     setPage(1);
-    refetch({
-      page: 1,
-      limit,
-      pagination: true,
-      keyword,
-      ...(value ? { category: value } : {}),
-    });
   };
 
   const handleLimitChange = (e) => {
-    const newLimit = Number(e.target.value);
-    setLimit(newLimit);
+    setLimit(Number(e.target.value));
     setPage(1);
+  };
+
+  // 🔥 Ensure refetch runs whenever page/limit/keyword/category change
+  useEffect(() => {
     refetch({
-      page: 1,
-      limit: newLimit,
+      page,
+      limit,
       pagination: true,
       keyword,
       ...(category ? { category } : {}),
     });
-  };
-
-  const productRows = data?.getProductWithPagination?.data || [];
-  const isEmpty = !loading && productRows.length === 0;
+  }, [page, limit, keyword, category, refetch]);
 
   return (
     <Stack sx={{ p: { xs: 2, md: 4 } }}>
@@ -156,13 +132,17 @@ export default function Products() {
           variant="contained"
           color="success"
           startIcon={<AddIcon />}
-          onClick={handleOpen}
+          onClick={() => setOpen(true)}
           sx={{ textTransform: "none", borderRadius: 2 }}
         >
           Create Product
         </Button>
 
-        <CreateProduct open={open} close={handleClose} setRefetch={refetch} />
+        <CreateProduct
+          open={open}
+          close={() => setOpen(false)}
+          setRefetch={refetch}
+        />
       </Stack>
 
       {/* FILTERS */}
@@ -174,7 +154,6 @@ export default function Products() {
                 fullWidth
                 size="small"
                 placeholder="Search products..."
-                value={keyword}
                 onChange={handleSearchChange}
                 InputProps={{
                   startAdornment: (
@@ -207,7 +186,7 @@ export default function Products() {
         </CardContent>
       </Card>
 
-      {/* TABLE */} 
+      {/* TABLE */}
       <Card elevation={2} sx={{ borderRadius: 3 }}>
         <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
           <Table>
@@ -261,10 +240,7 @@ export default function Products() {
                     </TableCell>
                     <TableCell align="center">{row.desc}</TableCell>
                     <TableCell align="center">
-                      <ActionProduct
-                        product={row}
-                        setRefetch={refetch}
-                      />
+                      <ActionProduct product={row} setRefetch={refetch} />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -281,8 +257,8 @@ export default function Products() {
           setPage={setPage}
           limit={limit}
           handleLimit={handleLimitChange}
-          totalDocs={paginationData?.totalDocs || 0}
-          totalPages={paginationData?.totalPages || 1}
+          totalDocs={paginator.totalDocs}
+          totalPages={paginator.totalPages}
         />
       </Stack>
     </Stack>
