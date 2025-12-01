@@ -146,7 +146,6 @@ export default function Navbar() {
                 borderBottom: "1px solid #eee",
               }}
             >
-              
               Logged in as: {username}
             </Typography>
             <Divider />

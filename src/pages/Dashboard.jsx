@@ -356,7 +356,7 @@ export default function Dashboard() {
               }}
             >
               <CardContent>
-                <Typography variant="h6" fontWeight={700} mb={1}>
+                <Typography variant="h6" fontWeight={700} mb={2}>
                   {formattedMonthYear} Top Selling Product
                 </Typography>
                 <Typography variant="h6" fontWeight={700} color={green[700]}>
