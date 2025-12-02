@@ -46,7 +46,6 @@ const client = new ApolloClient({
   },
 });
 
-
 const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

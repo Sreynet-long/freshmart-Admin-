@@ -62,6 +62,7 @@ export default function Dashboard() {
   const { data, loading, error, refetch } = useQuery(GET_DASHBOARD_STATS, {
     variables: { startDate, endDate },
     fetchPolicy: "cache-and-network",
+    pollInterval: 10000,
   });
 
   if (loading)
